@@ -1,18 +1,18 @@
 const { Queue } = require("bullmq");
-const dotenv = require("dotenv");
-dotenv.config();
+require('dotenv').config();
 
-// Support both individual parts and single REDIS_URL
+console.log('[db] Available Environment Keys:', Object.keys(process.env).filter(k => !k.startsWith('npm_') && !k.startsWith('NODE_')));
+
 if (process.env.REDIS_URL) {
-    console.log('[db] REDIS_URL detected. Connecting to production Redis...');
+    console.log('[db] SUCCESS: REDIS_URL found in environment.');
 } else {
-    console.log('[db] REDIS_URL not found. Falling back to localhost...');
+    console.log('[db] WARNING: REDIS_URL is MISSING from environment. Falling back to localhost.');
 }
 
 const connection = process.env.REDIS_URL 
   ? process.env.REDIS_URL 
   : {
-      host: process.env.REDIS_HOST || 'localhost',
+      host: process.env.REDIS_HOST || '127.0.0.1',
       port: process.env.REDIS_PORT || 6379,
       password: process.env.REDIS_PASSWORD || undefined,
     };

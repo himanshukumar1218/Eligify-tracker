@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_BASE as _API_BASE } from '../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown, Target, ListChecks, Trash2, Plus,
@@ -496,7 +497,7 @@ const DailyNotesSection: React.FC<{
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-const API_BASE = 'http://localhost:3000/api/users';
+const API_BASE = `${_API_BASE}/api/users`;
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem('token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import { UploadCloud, CheckCircle2, FileText, AlertCircle, RefreshCw, X, Trash2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { API_BASE } from '../utils/api';
 
 type DocumentStatus = 'pending' | 'verified' | 'rejected' | 'missing';
 
@@ -29,7 +30,7 @@ const DocumentWalletPage: React.FC = () => {
   const fetchDocuments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/documents', {
+      const res = await fetch(`${API_BASE}/api/documents`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -63,7 +64,7 @@ const DocumentWalletPage: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/documents/upload', {
+      const res = await fetch(`${API_BASE}/api/documents/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -88,7 +89,7 @@ const DocumentWalletPage: React.FC = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/api/documents/${docId}`, {
+      const res = await fetch(`${API_BASE}/api/documents/${docId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Clock, AlertCircle, CheckCircle2, Info, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../utils/api';
 
 type Category = 'all' | 'alert' | 'deadline' | 'system';
 
@@ -23,7 +24,7 @@ const NotificationsPage = () => {
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/notifications', {
+      const res = await fetch(`${API_BASE}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -44,7 +45,7 @@ const NotificationsPage = () => {
   const markAsRead = async (id: number) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:3000/api/notifications/${id}/read`, {
+      await fetch(`${API_BASE}/api/notifications/${id}/read`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });

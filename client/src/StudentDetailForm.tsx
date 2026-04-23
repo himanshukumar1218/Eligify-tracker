@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserCircle, GraduationCap, Award, Briefcase, Activity, FileText } from 'lucide-react';
+import { API_BASE } from './utils/api';
 import * as types from '@shared/constants/eligibilityConstants';
 const {
   CATEGORIES,
@@ -275,7 +276,7 @@ const StudentDetailFormDashboard: React.FC = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) { setProfileLoading(false); return; }
-        const res = await fetch('http://localhost:3000/api/users/profile', {
+        const res = await fetch(`${API_BASE}/api/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const json = await res.json();
@@ -424,7 +425,7 @@ const StudentDetailFormDashboard: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:3000/api/users/studentDetails', {
+      const response = await fetch(`${API_BASE}/api/users/studentDetails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

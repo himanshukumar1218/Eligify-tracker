@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Target, Zap, Clock, Bell, AlertTriangle, ArrowRight, CheckCircle2, UserCircle } from 'lucide-react';
 import { getEligibilityReadiness, type MissingField } from '../utils/profileReadiness';
+import { API_BASE } from '../utils/api';
 
 // Types
 type ExamRow = {
@@ -43,9 +44,9 @@ const DashboardHomePage: React.FC = () => {
 
         // Run fetches in parallel
         const [profileRes, examsRes, notifRes] = await Promise.all([
-          fetch('http://localhost:3000/api/users/profile', { headers }),
-          fetch('http://localhost:3000/api/exams/eligible', { headers }),
-          fetch('http://localhost:3000/api/notifications', { headers })
+          fetch(`${API_BASE}/api/users/profile`, { headers }),
+          fetch(`${API_BASE}/api/exams/eligible`, { headers }),
+          fetch(`${API_BASE}/api/notifications`, { headers })
         ]);
 
         const profileJson = await profileRes.json();

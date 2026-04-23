@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getEligibilityReadiness } from '../utils/profileReadiness';
 import { CheckCircle2, AlertTriangle, Pencil, User, BookOpen, Activity, Briefcase, Award } from 'lucide-react';
+import { API_BASE } from '../utils/api';
 
 const formatDate = (dateString: string) => {
   if (!dateString) return 'N/A';
@@ -84,7 +85,7 @@ const MyProfilePage: React.FC = () => {
       setError(null); setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:3000/api/users/profile', {
+        const response = await fetch(`${API_BASE}/api/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error('Could not fetch your profile data.');

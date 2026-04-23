@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import EligibilityDrawer, { type ExamData, type EligibilityReason } from '../components/dashboard/EligibilityDrawer';
+import { API_BASE } from '../utils/api';
 
 const statusStyles: Record<string, string> = {
   Eligible: 'border border-emerald-400/20 bg-emerald-400/10 text-emerald-200',
@@ -64,7 +65,7 @@ const EligibleExamsPage: React.FC = () => {
     const fetchExams = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:3000/api/exams/eligible', {
+        const res = await fetch(`${API_BASE}/api/exams/eligible`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const result: EligibleExamsResponse = await res.json();

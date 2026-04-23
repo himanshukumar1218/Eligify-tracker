@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../../utils/api';
 
 export interface AppNotification {
   id: number;
@@ -23,7 +24,7 @@ const NotificationDropdown = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/notifications', {
+      const res = await fetch(`${API_BASE}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -57,7 +58,7 @@ const NotificationDropdown = () => {
   const markAsRead = async (id: number) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:3000/api/notifications/${id}/read`, {
+      await fetch(`${API_BASE}/api/notifications/${id}/read`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       });

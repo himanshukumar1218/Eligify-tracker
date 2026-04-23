@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { API_BASE } from './utils/api';
 import Form from './Form';
 import Signup from './Signup';
 import StudentDetailForm from './StudentDetailForm';
@@ -24,7 +25,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <Form
-      signInEndpoint="http://localhost:3000/api/users/login"
+      signInEndpoint={`${API_BASE}/api/users/login`}
       onOpenSignup={() => navigate('/signup')}
       onForgotPassword={() => navigate('/forgot-password')}
       onSuccess={() => {
@@ -52,7 +53,7 @@ const SignupPage: React.FC = () => {
 
   return (
     <Signup
-      signupEndpoint="http://localhost:3000/api/users/signup"
+      signupEndpoint={`${API_BASE}/api/users/signup`}
       onOpenLogin={() => navigate('/login')}
       onSuccess={() => navigate('/dashboard')}
     />

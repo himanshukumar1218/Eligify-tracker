@@ -1,22 +1,24 @@
 const { Queue } = require("bullmq");
+const Redis = require("ioredis");
 require('dotenv').config();
 
-console.log('[db] Available Environment Keys:', Object.keys(process.env).filter(k => !k.startsWith('npm_') && !k.startsWith('NODE_')));
-
+// Support both individual parts and single REDIS_URL
+let connection;
 if (process.env.REDIS_URL) {
-    console.log('[db] SUCCESS: REDIS_URL found in environment.');
+    console.log('[db] SUCCESS: REDIS_URL found. Initializing Production Redis connection...');
+    connection = new Redis(process.env.REDIS_URL, {
+        maxRetriesPerRequest: null,
+        tls: process.env.REDIS_URL.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
+    });
 } else {
-    console.log('[db] WARNING: REDIS_URL is MISSING from environment. Falling back to localhost.');
-}
-
-// BullMQ v5 requires connection as an object { url } or { host, port }
-const connection = process.env.REDIS_URL 
-  ? { url: process.env.REDIS_URL }
-  : {
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD || undefined,
+    console.log('[db] WARNING: REDIS_URL is MISSING. Falling back to localhost.');
+    connection = {
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD || undefined,
+        maxRetriesPerRequest: null,
     };
+}
 
 const notificationQueue = new Queue('NotificationQueue', {
     connection,

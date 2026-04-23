@@ -73,7 +73,7 @@ const Signup: React.FC<SignupProps> = ({
       const data: SignupResponse = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || 'Signup failed. Please try again.');
+        throw new Error((data as any).message || (data as any).error || 'Signup failed. Please try again.');
       }
 
       // 1. TOKEN ALGO: Save the JWT from the signup response

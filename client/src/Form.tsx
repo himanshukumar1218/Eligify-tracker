@@ -73,10 +73,11 @@ const Form: React.FC<FormProps> = ({
         }),
       });
 
-      const data: SignInResponse = await response.json().catch(() => ({}));
+      const data: SignInResponse & { error?: string } = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.message || 'Sign in failed. Please try again.');
+        const errorMsg = data.message || data.error || 'Sign in failed. Please try again.';
+        throw new Error(errorMsg);
       }
 
       // 1. TOKEN ALGO: Save the JWT to the browser's storage

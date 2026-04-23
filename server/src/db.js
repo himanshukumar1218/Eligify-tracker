@@ -3,30 +3,25 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const missingEnv = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT', 'DB_NAME'].filter(
-  (key) => !process.env[key]
-);
+// check if we are using a single URL or individual parts
+const connectionString = process.env.DATABASE_URL;
 
-if (missingEnv.length > 0) {
-  console.error('[db] Missing required environment variables:', missingEnv.join(', '));
+if (!connectionString) {
+  console.error('[db] Error: DATABASE_URL is missing from .env');
 }
 
-console.log('[db] Initializing PostgreSQL pool', {
-  user: process.env.DB_USER || '(missing)',
-  host: process.env.DB_HOST || '(missing)',
-  port: process.env.DB_PORT || '(missing)',
-  database: process.env.DB_NAME || '(missing)',
-});
-
 const pool = new Pool({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
+  connectionString: connectionString,
+  ssl: {
+    rejectUnauthorized: false,
+  },
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 600000,
+});
+
+pool.on('connect', () => {
+  console.log('[db] Connected to PostgreSQL successfully');
 });
 
 pool.on('error', (error) => {

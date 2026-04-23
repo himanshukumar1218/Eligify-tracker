@@ -9,12 +9,12 @@ exports.signup = async (req, res) => {
 
         const existingUserName = await userQueries.getUserByUserName(username);
         if (existingUserName) {
-            return res.status(400).json({ error: "Try Another Username" });
+            return res.status(400).json({ message: "Username already taken. Please try another." });
         }
 
         const existingUser = await userQueries.getUserByEmail(email);
         if (existingUser) {
-            return res.status(400).json({ error: "User already exists" });
+            return res.status(400).json({ message: "An account with this email already exists." });
         }
 
         const password_hash = await bcrypt.hash(password, 10);
@@ -52,13 +52,13 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const existingUser = await userQueries.getUserByEmail(email)
+        const existingUser = await userQueries.getUserByEmail(email);
         if (!existingUser) {
-            return res.status(400).json({ error: "User does not exist. SignUp FIrst" })
+            return res.status(400).json({ message: "No account found with this email. Please sign up first." });
         }
-        const isMatch = await bcrypt.compare(password, existingUser.password_hash)
+        const isMatch = await bcrypt.compare(password, existingUser.password_hash);
         if (!isMatch) {
-            return res.status(401).send("Wrong Password.Try Again")
+            return res.status(401).json({ message: "Incorrect password. Please try again." });
         }
 
         const token = jwt.sign({

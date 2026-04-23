@@ -2,11 +2,14 @@ const { Queue } = require("bullmq");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const connection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: process.env.REDIS_PORT || 6379,
-  password: process.env.REDIS_PASSWORD || undefined,
-};
+// Support both individual parts and single REDIS_URL
+const connection = process.env.REDIS_URL 
+  ? process.env.REDIS_URL 
+  : {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || 6379,
+      password: process.env.REDIS_PASSWORD || undefined,
+    };
 
 const notificationQueue = new Queue('NotificationQueue', {
     connection,

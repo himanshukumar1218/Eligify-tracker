@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+.DS_Store
+Thumbs.db
+
+# ── Exclude non-source folders ────────────────────────────────
+Automation/
+
+# ── Exclude any personal/temp files at root ───────────────────
+*.txt

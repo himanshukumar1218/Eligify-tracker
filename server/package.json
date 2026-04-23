@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test src/constants/eligibilityConstants.test.js src/eligibilityEngine/utils/profileReadiness.test.js src/controllers/eligibilityControllers.test.js src/utils/validationExamSchema.test.js src/utils/persistenceNormalization.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.0",
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.73.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "ioredis": "^5.10.1",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.5",
+    "pg": "^8.20.0",
+    "router": "^2.2.0"
+  }
+}

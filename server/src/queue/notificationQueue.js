@@ -3,6 +3,12 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // Support both individual parts and single REDIS_URL
+if (process.env.REDIS_URL) {
+    console.log('[db] REDIS_URL detected. Connecting to production Redis...');
+} else {
+    console.log('[db] REDIS_URL not found. Falling back to localhost...');
+}
+
 const connection = process.env.REDIS_URL 
   ? process.env.REDIS_URL 
   : {

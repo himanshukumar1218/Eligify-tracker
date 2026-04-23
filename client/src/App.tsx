@@ -19,6 +19,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import RouteSeo from './components/RouteSeo';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -70,39 +71,42 @@ const AdminFormPage: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/landing" element={<LandingPage />} />
+    <>
+      <RouteSeo />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/landing" element={<LandingPage />} />
 
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-      <Route path="/" element={<DashboardLayout />}>
-        <Route path="dashboard" element={<DashboardHomePage />} />
-        <Route path="eligible-exams" element={<EligibleExamsPage />} />
-        <Route path="my-profile" element={<MyProfilePage />} />
-        <Route path="student-details" element={<StudentDetailsPage />} />
+        <Route path="/" element={<DashboardLayout />}>
+          <Route path="dashboard" element={<DashboardHomePage />} />
+          <Route path="eligible-exams" element={<EligibleExamsPage />} />
+          <Route path="my-profile" element={<MyProfilePage />} />
+          <Route path="student-details" element={<StudentDetailsPage />} />
 
-        <Route path="documents" element={<DocumentWalletPage />} />
-        <Route path="prep-tracker" element={<PrepTrackerPage />} />
-        <Route path="notifications" element={<NotificationsPage />} />
-      </Route>
+          <Route path="documents" element={<DocumentWalletPage />} />
+          <Route path="prep-tracker" element={<PrepTrackerPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
+        </Route>
 
-      {/* Admin Pages (Protected and separated from Student Dashboard Layout) */}
-      <Route 
-        path="/admin" 
-        element={
-          <ProtectedRoute requireAdmin={true}>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<AdminFormPage />} />
-        <Route path="review-discoveries" element={<ReviewDiscoveredExamsPage />} />
-      </Route>
+        {/* Admin Pages (Protected and separated from Student Dashboard Layout) */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireAdmin={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminFormPage />} />
+          <Route path="review-discoveries" element={<ReviewDiscoveredExamsPage />} />
+        </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 };
 

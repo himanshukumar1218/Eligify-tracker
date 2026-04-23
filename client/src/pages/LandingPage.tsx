@@ -44,11 +44,11 @@ const LandingPage: React.FC = () => {
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">
                 Government Exam Platform
               </p>
-              <h1 className="text-xl font-bold tracking-tight text-white">
-                EligibilityHub
-              </h1>
+                <p className="text-xl font-bold tracking-tight text-white">
+                  EligibilityHub
+                </p>
+              </div>
             </div>
-          </div>
 
           <div className="flex items-center gap-3">
             <Link
@@ -83,15 +83,15 @@ const LandingPage: React.FC = () => {
                 </span>
               </motion.div>
               
-              <motion.h2 variants={fadeInUp} className="mt-8 text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-[4.5rem] leading-[1.1]">
-                Stop Guessing. <br/>
+              <motion.h1 variants={fadeInUp} className="mt-8 text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-[4.5rem] leading-[1.1]">
+                Check Your Government Exam Eligibility Faster. <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-300">
-                  Start Applying.
+                  Track Alerts. Apply Smarter.
                 </span>
-              </motion.h2>
+              </motion.h1>
               
               <motion.p variants={fadeInUp} className="mt-6 text-lg leading-relaxed text-slate-400">
-                The ultimate eligibility engine for government exams. Build your verified profile once, and let our intelligent system instantly match you with opportunities you're qualified for.
+                Build your verified profile once, check which government exams you qualify for, and stay ahead of application deadlines with timely alerts from Eligify.
               </motion.p>
 
               <motion.div variants={fadeInUp} className="mt-10 flex flex-wrap gap-4">
@@ -135,7 +135,9 @@ const LandingPage: React.FC = () => {
               <div className="relative rounded-[2rem] border border-white/10 bg-slate-900/50 p-2 backdrop-blur-xl shadow-2xl">
                 <img 
                   src="/images/hero-abstract.png" 
-                  alt="Dashboard Abstract" 
+                  alt="Eligify dashboard preview showing government exam eligibility insights"
+                  width="1024"
+                  height="1024"
                   className="rounded-[1.5rem] w-full h-auto object-cover border border-white/5"
                 />
                 
@@ -195,7 +197,10 @@ const LandingPage: React.FC = () => {
                   <div className="absolute inset-0 bg-emerald-500/5" />
                   <img 
                     src="/images/shield-icon.png" 
-                    alt="Secure Profile" 
+                    alt="Illustration representing secure candidate profile storage"
+                    loading="lazy"
+                    width="1024"
+                    height="1024"
                     className="w-48 h-48 object-contain mb-8 z-10 drop-shadow-[0_0_30px_rgba(16,185,129,0.3)]"
                   />
                   <div className="relative z-10">

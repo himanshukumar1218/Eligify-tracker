@@ -9,11 +9,12 @@ if (process.env.REDIS_URL) {
     console.log('[db] WARNING: REDIS_URL is MISSING from environment. Falling back to localhost.');
 }
 
+// BullMQ v5 requires connection as an object { url } or { host, port }
 const connection = process.env.REDIS_URL 
-  ? process.env.REDIS_URL 
+  ? { url: process.env.REDIS_URL }
   : {
       host: process.env.REDIS_HOST || '127.0.0.1',
-      port: process.env.REDIS_PORT || 6379,
+      port: parseInt(process.env.REDIS_PORT || '6379'),
       password: process.env.REDIS_PASSWORD || undefined,
     };
 

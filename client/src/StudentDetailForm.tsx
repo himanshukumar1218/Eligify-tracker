@@ -785,6 +785,22 @@ const StudentDetailFormDashboard: React.FC = () => {
                     <h3 className="col-span-1 md:col-span-2 mt-4 text-sm font-bold text-cyan-300 border-b border-white/5 pb-2">
                       {qualification === 'postgraduate' ? 'Postgraduate Degree Details' : 'Degree Details'}
                     </h3>
+                    <Field label="Programme" htmlFor="programme">
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select Programme' }, ...Object.keys(qualification ? (coursesData[qualification] || {}) : {}).map(p => ({ value: p, label: p })), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.academic.programme, qualification ? Object.keys(coursesData[qualification] || {}) : [], 'programme')}
+                        onChange={(val) => handleAcademicSelectWithOther('programme', val)}
+                      />
+                      {shouldShowCustomInput(formData.academic.programme, qualification ? Object.keys(coursesData[qualification] || {}) : [], 'programme') ? (
+                        <input className={`${inputClasses} mt-3`} value={formData.academic.programme} onChange={(e) => updateField('academic', 'programme', e.target.value)} placeholder="Enter programme name" />
+                      ) : null}
+                    </Field>
+                    <Field label="Branch/Specialization" htmlFor="branch">
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select Branch' }, ...(qualification && formData.academic.programme && coursesData[qualification]?.[formData.academic.programme] ? coursesData[qualification][formData.academic.programme].map((b: string) => ({ value: b, label: b })) : []), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.academic.branch, qualification && formData.academic.programme && coursesData[qualification]?.[formData.academic.programme] ? coursesData[qualification][formData.academic.programme] : [], 'branch')}
+                        onChange={(val) => handleAcademicSelectWithOther('branch', val)}
+                      />
                       {shouldShowCustomInput(formData.academic.branch, qualification && formData.academic.programme && coursesData[qualification]?.[formData.academic.programme] ? coursesData[qualification][formData.academic.programme] : [], 'branch') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.branch} onChange={(e) => updateField('academic', 'branch', e.target.value)} placeholder="Enter branch name" />
                       ) : null}
@@ -934,7 +950,6 @@ const StudentDetailFormDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

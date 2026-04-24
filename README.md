@@ -133,9 +133,10 @@ Eligify is a testament to **First-Principles Thinking**. Every feature is mapped
 **Himanshu Kumar**  
 B.Tech CSE — BIT Mesra, Jaipur Campus (2023–2027) | GPA: 8.3/10  
 
-- 🎖️ **SSB Recommended**: Recommended by the Service Selection Board for the Indian Armed Forces — showcasing leadership, logic, and composure.
-- 💻 **DSA Focused**: 100+ LeetCode problems solved, specializing in pattern recognition and system optimization.
-- 🏫 **Ex-Sainik**: Discipline and engineering rigor from Sainik School, Gopalganj (96.5% Class X).
+| Credential | Detail |
+|---|---|
+| 🎖️ **SSB Recommended** | Selected by the Service Selection Board — a rigorous multi-day psychological and leadership assessment used by the Indian Armed Forces. A testament to reasoning ability, composure under pressure, and the leadership discipline I apply to every system I build. |
+| 💻 **100+ LeetCode** | Focused on Data Structures & Algorithms — the foundation for the pattern-recognition approach in Eligify's engine design. |
 
 **Tech Stack**: JavaScript (ES6+), TypeScript, React, Node.js, Express, PostgreSQL, Redis, BullMQ, Framer Motion, Tailwind CSS.
 

@@ -66,18 +66,9 @@ const ExamSelector: React.FC<{
   exams: ExamData[];
   selected: number | null;
   onChange: (id: number) => void;
-  loading?: boolean;
-}> = ({ exams, selected, onChange, loading = false }) => {
+}> = ({ exams, selected, onChange }) => {
   const [open, setOpen] = useState(false);
   const current = exams.find(e => e.id === selected);
-
-  if (loading) {
-    return (
-      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/80 px-5 py-2 text-sm text-slate-500">
-        <Loader text="Exams" />
-      </div>
-    );
-  }
 
   return (
     <div className="relative inline-block w-full sm:w-auto">
@@ -615,6 +606,10 @@ const PrepTrackerPage: React.FC = () => {
     }
   };
 
+  if (examsLoading) {
+    return <Loader text="Preparing Your Tracker" />;
+  }
+
   return (
     <div className="space-y-6 lg:space-y-8 pb-10">
       {/* Header */}
@@ -623,7 +618,7 @@ const PrepTrackerPage: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-white tracking-tight">Prep Tracker</h1>
           <p className="mt-1 text-sm text-slate-400">Master your preparation with powerful daily tracking.</p>
         </div>
-        <ExamSelector exams={exams} selected={selectedExam} onChange={setSelectedExam} loading={examsLoading} />
+        <ExamSelector exams={exams} selected={selectedExam} onChange={setSelectedExam} />
       </div>
 
       {/* Bento Box Grid */}

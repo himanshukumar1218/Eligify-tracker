@@ -7,7 +7,7 @@ const {
 } = require('../constants/eligibilityConstants');
 
 const signupSchema = Joi.object({
-    username : Joi.string().alphanum().min(3).max(10).required() ,
+    username : Joi.string().alphanum().min(3).max(30).required() ,
     email : Joi.string().email().required() ,
     password : Joi.string().alphanum().required()
 })
@@ -15,6 +15,10 @@ const signupSchema = Joi.object({
 const loginSchema = Joi.object({
     email : Joi.string().email().required() ,
     password : Joi.required() 
+})
+
+const googleLoginSchema = Joi.object({
+    token: Joi.string().required()
 })
 
 const userDetailsSchema = Joi.object({
@@ -86,4 +90,4 @@ const userDetailsSchema = Joi.object({
 
 
 
-module.exports = {signupSchema,loginSchema,userDetailsSchema}
+module.exports = {signupSchema,loginSchema,userDetailsSchema,googleLoginSchema}

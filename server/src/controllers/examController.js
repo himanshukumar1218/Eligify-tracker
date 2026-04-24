@@ -47,25 +47,19 @@ exports.getEligibleExams = async (req, res) => {
     });
 
   } catch (err) {
-    console.error(`[ExamController] Bulk scan error:`, err);
-
-    if (err.code === PROFILE_INCOMPLETE_CODE) {
+    if (err.code === PROFILE_INCOMPLETE_CODE || err.message.includes('Onboarding incomplete')) {
       return res.status(err.statusCode || 400).json({
         success: false,
-        code: PROFILE_INCOMPLETE_CODE,
+        code: PROFILE_INCOMPLETE_CODE || 'ONBOARDING_INCOMPLETE',
         missingFields: err.missingFields || [],
         optionalMissing: err.optionalMissing || [],
-        message: err.message,
+        message: err.message.includes('Onboarding incomplete') 
+          ? "Please complete your profile to see matched exams."
+          : err.message,
       });
     }
 
-    // Provide a specific message if the profile is missing
-    if (err.message.includes('Onboarding incomplete')) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Please complete your profile to see matched exams." 
-      });
-    }
+    console.error(`[ExamController] Bulk scan error:`, err);
 
     return res.status(500).json({ 
       success: false, 

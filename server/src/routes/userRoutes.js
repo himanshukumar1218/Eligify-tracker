@@ -10,13 +10,13 @@ const prepTrackerController = require('../controllers/prepTrackerController.js')
 const {validate} = require('../middlewares/validate.js')
 const {protect} = require('../middlewares/authMiddleware.js')
 
-const {signupSchema,loginSchema,userDetailsSchema} = require('../utils/validationSchema.js')
+const {signupSchema,loginSchema,userDetailsSchema,googleLoginSchema} = require('../utils/validationSchema.js')
 const {addTaskSchema,upsertNoteSchema} = require('../utils/validationPrepTracker.js')
 
 // --- Authentication & User Routes ---
 router.post('/signup',validate(signupSchema),userController.signup)
 router.post('/login',validate(loginSchema),userController.login)
-router.post('/google-login', userController.googleLogin)
+router.post('/google-login', validate(googleLoginSchema), userController.googleLogin)
 router.get('/profile',protect,getProfileController.getProfile)
 router.post('/studentDetails' ,  protect ,validate(userDetailsSchema), userDetailsController.userDetails)
 router.get('/check-eligibility/:postId',protect, eligibilityController.checkPostEligibility);

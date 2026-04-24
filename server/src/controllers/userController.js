@@ -112,7 +112,10 @@ exports.googleLogin = async (req, res) => {
         let user = await userQueries.getUserByEmail(email);
         
         if (!user) {
-            let username = email.split('@')[0];
+            let username = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+            // Truncate to ensure there's room for random numbers and stays under 30 chars
+            if (username.length > 20) username = username.substring(0, 20);
+
             const existingUserName = await userQueries.getUserByUserName(username);
             if (existingUserName) {
                 username = username + Math.floor(Math.random() * 1000);

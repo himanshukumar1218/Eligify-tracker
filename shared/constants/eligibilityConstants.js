@@ -37,40 +37,84 @@ const EXAM_STATUSES = [
 ];
 
 const CERTIFICATION_OPTIONS = [
+  // Teaching Certifications
   'B.Ed',
-  'BTC',
   'D.El.Ed',
+  'BTC',
+  'CTET',
+  'TET',
+  'Teacher Training',
+
+  // Vocational / Trade
   'ITI',
   'Diploma',
-  'NCC',
-  'Computer Certificate',
-  'Typing',
-  'Stenography',
-  'Driving License',
+  'Polytechnic Diploma',
+
+  // Professional (Finance/Law)
   'CA',
   'CMA',
   'CS',
+  'LLB',
+
+  // Medical / Paramedical
   'Nursing',
   'Pharmacist',
-  'Teacher Training',
+  'DMLT',           // Diploma in Medical Lab Technology
+  'ANM',            // Auxiliary Nurse Midwife
+
+  // Defence
+  'NCC',
+
+  // Skill / Office
+  'Computer Certificate',
+  'Typing',
+  'Stenography',
+  'DCA',            // Diploma in Computer Applications
+  'PGDCA',          // Post Graduate Diploma in Computer Applications
+  'Tally',
+
+  // Mobility
+  'Driving License',
+
+  // Agriculture
+  'Agriculture Diploma',
 ];
 
 const EXPERIENCE_FIELDS = [
+  // Core White-Collar
   'Teaching',
-  'Engineering',
   'Accounts',
   'Clerk',
-  'Technician',
-  'Medical',
-  'IT',
   'Legal',
+  'IT',
+
+  // Technical / Trades
+  'Engineering',
+  'Technician',
+  'Electrician',
+  'Operator',       // Plant, Machine, Equipment
+
+  // Medical
+  'Medical',
+  'Paramedical',
+
+  // Sector-Specific
+  'Banking',
+  'Insurance',
   'Agriculture',
+  'Forest / Wildlife',
+
+  // Field / Ground
+  'Police / Security',
+  'Defence',
+  'Driver',
+
+  // Other
   'Other',
 ];
-
 const BOARD_OPTIONS = [
-  "CBSE", "ICSE", "NIOS", "UP Board", "Bihar Board", "Maharashtra Board", 
-  "Tamil Nadu Board", "Karnataka Board", "Rajasthan Board", "West Bengal Board", 
+  "CBSE", "ICSE", "NIOS", "UP Board", "Bihar Board", "Maharashtra Board",
+  "Tamil Nadu Board", "Karnataka Board", "Rajasthan Board", "West Bengal Board",
   "Gujarat Board", "Andhra Pradesh Board", "Telangana Board", "State Board (Other)"
 ];
 
@@ -82,17 +126,17 @@ const TWELFTH_SUBJECTS_OPTIONS = [
 ];
 
 const SECTORS = [
-  "Banking", "Defence", "Railways", "SSC", "State PSC", 
+  "Banking", "Defence", "Railways", "SSC", "State PSC",
   "Teaching", "Police", "UPSC", "Medical", "Other"
 ];
 
 const INDIAN_STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", 
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", 
-  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
-  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", 
-  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", 
-  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", 
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi",
   "Jammu & Kashmir", "Ladakh", "Puducherry", "Chandigarh", "Other UT"
 ];
 
@@ -137,18 +181,18 @@ const COURSES_DATA = {
       "Forensic Science", "Aviation", "Nautical Science", "Interior Design", "Fashion Design",
       "Physical Education", "B.Stat", "B.Math"
     ],
-    "B.Com": [ "General", "Accounting & Finance", "Banking & Insurance", "Taxation", "Computer Applications", "Corporate Secretaryship", "Honours" ],
+    "B.Com": ["General", "Accounting & Finance", "Banking & Insurance", "Taxation", "Computer Applications", "Corporate Secretaryship", "Honours"],
     "B.A.": [
       "History", "Political Science", "Economics", "Geography", "English", "Hindi", "Sanskrit",
       "Regional Language", "Sociology", "Psychology", "Philosophy", "Public Administration",
       "Journalism & Mass Communication", "Social Work (BSW)", "Fine Arts (BFA)", "Music",
       "Dance", "Physical Education", "Yoga", "Tourism", "Honours"
     ],
-    "Management & Computer Apps": [ "BBA (General)", "BBA (Business Analytics)", "BBA (Finance/Marketing/HR)", "BMS", "BCA", "B.Sc (IT)" ],
-    "Medical & Healthcare": [ "MBBS", "BDS", "BAMS", "BHMS", "BUMS", "BSMS", "BNYS", "B.Pharm", "BPT (Physiotherapy)", "BOT (Occupational Therapy)", "B.Sc (MLT)", "B.Sc (Radiology)", "B.Sc (Nursing)", "BVSc & AH" ],
-    "Law": [ "LLB (3 Years)", "Integrated BA LLB", "Integrated BBA LLB", "Integrated B.Com LLB" ],
-    "Architecture & Design": [ "B.Arch", "B.Planning", "B.Des (Graphic/Fashion/Interior/Product)" ],
-    "Education": [ "B.Ed", "B.El.Ed", "B.P.Ed" ]
+    "Management & Computer Apps": ["BBA (General)", "BBA (Business Analytics)", "BBA (Finance/Marketing/HR)", "BMS", "BCA", "B.Sc (IT)"],
+    "Medical & Healthcare": ["MBBS", "BDS", "BAMS", "BHMS", "BUMS", "BSMS", "BNYS", "B.Pharm", "BPT (Physiotherapy)", "BOT (Occupational Therapy)", "B.Sc (MLT)", "B.Sc (Radiology)", "B.Sc (Nursing)", "BVSc & AH"],
+    "Law": ["LLB (3 Years)", "Integrated BA LLB", "Integrated BBA LLB", "Integrated B.Com LLB"],
+    "Architecture & Design": ["B.Arch", "B.Planning", "B.Des (Graphic/Fashion/Interior/Product)"],
+    "Education": ["B.Ed", "B.El.Ed", "B.P.Ed"]
   },
   postgraduate: {
     "M.Tech / M.E.": [
@@ -170,11 +214,11 @@ const COURSES_DATA = {
       "MBA (Business Analytics)", "MBA (International Business)", "MBA (Rural Management)",
       "MBA (Agri-Business)", "PGDM"
     ],
-    "Computer Applications": [ "MCA" ],
-    "M.Com": [ "General", "Accounting", "Finance", "Business Management", "Taxation" ],
-    "M.A.": [ "Economics", "English", "Psychology", "Public Administration", "History", "Political Science", "Sociology", "Geography", "Philosophy", "Mass Communication & Journalism", "Social Work (MSW)", "Fine Arts (MFA)" ],
-    "Medical & Law": [ "MS (Surgery)", "MD (Medicine)", "MDS", "M.Pharm", "MPT", "LLM" ],
-    "Education": [ "M.Ed", "M.P.Ed" ]
+    "Computer Applications": ["MCA"],
+    "M.Com": ["General", "Accounting", "Finance", "Business Management", "Taxation"],
+    "M.A.": ["Economics", "English", "Psychology", "Public Administration", "History", "Political Science", "Sociology", "Geography", "Philosophy", "Mass Communication & Journalism", "Social Work (MSW)", "Fine Arts (MFA)"],
+    "Medical & Law": ["MS (Surgery)", "MD (Medicine)", "MDS", "M.Pharm", "MPT", "LLM"],
+    "Education": ["M.Ed", "M.P.Ed"]
   }
 };
 

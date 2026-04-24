@@ -12,6 +12,7 @@ const {
   CERTIFICATION_OPTIONS: certificationOptions,
   EXPERIENCE_FIELDS: experienceFields,
   BOARD_OPTIONS: boardOptions,
+  INDIAN_STATES: domicileStates,
   TWELFTH_SUBJECTS_OPTIONS: twelfthSubjectsOptions,
   COURSES_DATA: coursesData,
 } = ((types as any).default || types) as typeof types;
@@ -676,7 +677,7 @@ const StudentDetailFormDashboard: React.FC = () => {
                     </Field>
                     <Field label="Domicile State" htmlFor="domicile">
                       <CustomDropdown
-                        options={[{ value: '', label: 'Select State' }, ...DOMICILE_STATES.map(s => ({ value: s, label: s }))]}
+                        options={[{ value: '', label: 'Select State' }, ...domicileStates.map((state: string) => ({ value: state, label: state }))]}
                         value={formData.basic.domicile}
                         onChange={(val) => updateField('basic', 'domicile', val)}
                       />
@@ -724,7 +725,7 @@ const StudentDetailFormDashboard: React.FC = () => {
                       <>
                         <Field label="10th Board" htmlFor="tenthBoard" span={2}>
                           <CustomDropdown
-                            options={[{ value: '', label: 'Select Board' }, ...SCHOOL_BOARDS.map(b => ({ value: b, label: b }))]}
+                            options={[{ value: '', label: 'Select Board' }, ...boardOptions.map((board: string) => ({ value: board, label: board }))]}
                             value={formData.academic.tenthBoard}
                             onChange={(val) => updateField('academic', 'tenthBoard', val)}
                           />

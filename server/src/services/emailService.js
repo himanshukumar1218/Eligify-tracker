@@ -66,4 +66,68 @@ const sendMatchEmail = async (userEmail, userName, examName, postName) => {
     }
 };
 
-module.exports = { sendMatchEmail };
+/**
+ * Sends a welcome email to a new user
+ * @param {string} userEmail - The email address of the student
+ * @param {string} userName - The name of the student
+ */
+const sendWelcomeEmail = async (userEmail, userName) => {
+    if (!process.env.SMTP_USER || process.env.SMTP_USER === 'your_email@gmail.com') {
+        console.log(`[EmailService] Skipping welcome email to ${userEmail} (SMTP not configured)`);
+        return false;
+    }
+
+    try {
+        const mailOptions = {
+            from: `"Eligify Team" <${process.env.SMTP_USER}>`,
+            to: userEmail,
+            subject: `🚀 Welcome to Eligify, ${userName}!`,
+            html: `
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #020617; color: #f8fafc; border-radius: 16px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="display: inline-block; padding: 12px; background: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%); border-radius: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 24px; color: white; font-weight: bold;">E</span>
+                        </div>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; letter-spacing: -0.5px;">Welcome to Eligify</h1>
+                    </div>
+                    
+                    <div style="background-color: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b;">
+                        <h2 style="margin-top: 0; color: #22d3ee; font-size: 20px;">Hello ${userName},</h2>
+                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6;">
+                            We're thrilled to have you on board! You've just taken a major step toward simplifying your exam preparation journey.
+                        </p>
+                        
+                        <div style="margin: 25px 0; padding: 20px; background-color: #1e293b; border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #ffffff; font-size: 16px;">What's next?</h3>
+                            <ul style="color: #94a3b8; padding-left: 20px; margin-bottom: 0;">
+                                <li style="margin-bottom: 10px;">Complete your <b>Academic Profile</b> to unlock matches.</li>
+                                <li style="margin-bottom: 10px;">Check your <b>Personalized Eligibility</b> dashboard.</li>
+                                <li>Start tracking your <b>Preparation Milestones</b>.</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="https://geteligify.app/dashboard" style="display: inline-block; background: linear-gradient(to right, #22d3ee, #06b6d4); color: #020617; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                Launch Your Dashboard
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #475569; font-size: 13px; text-align: center; margin-top: 30px;">
+                        Need help getting started? Just reply to this email! <br>
+                        © 2024 Eligify Platform. All rights reserved.
+                    </p>
+                </div>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`[EmailService] Welcome email sent to ${userEmail}`);
+        return true;
+    } catch (error) {
+        console.error(`[EmailService] Failed to send welcome email:`, error);
+        return false;
+    }
+};
+
+module.exports = { sendMatchEmail, sendWelcomeEmail };

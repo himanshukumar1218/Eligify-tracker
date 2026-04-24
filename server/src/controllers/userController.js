@@ -2,6 +2,7 @@ const userQueries = require('../queries/userQueries')
 const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv")
 const bcrypt = require("bcrypt")
+const { sendWelcomeEmail } = require("../services/emailService")
 dotenv.config()
 exports.signup = async (req, res) => {
     try {
@@ -20,6 +21,9 @@ exports.signup = async (req, res) => {
         const password_hash = await bcrypt.hash(password, 10);
 
         const user = await userQueries.createUser(username, email, password_hash);
+
+        // Send welcome email (fire and forget)
+        sendWelcomeEmail(user.email, user.username).catch(e => console.error("[Email] Welcome email failed:", e));
 
         const token = jwt.sign(
             {
@@ -123,6 +127,9 @@ exports.googleLogin = async (req, res) => {
 
             const password_hash = await bcrypt.hash(Math.random().toString(36), 10);
             user = await userQueries.createUser(username, email, password_hash);
+            
+            // Send welcome email for new Google user (fire and forget)
+            sendWelcomeEmail(user.email, user.username).catch(e => console.error("[Email] Google welcome email failed:", e));
         }
         
         const token = jwt.sign({

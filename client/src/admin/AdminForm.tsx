@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { API_BASE } from "../utils/api";
 import * as types from "@shared/constants/eligibilityConstants";
 const {
   ALL_SENTINEL,
@@ -939,10 +940,8 @@ export default function ExamNotificationForm({ initialData = null }: { initialDa
     const payload = buildPayload();
     setSubmitted(payload);
     setIsSubmitting(true);
-    console.log("Payload:", payload);
-    console.log(JSON.stringify(payload));
     try {
-      const response = await fetch("http://127.0.0.1:3000/api/admin/exams", {
+      const response = await fetch(`${API_BASE}/api/admin/exams`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -965,11 +964,15 @@ export default function ExamNotificationForm({ initialData = null }: { initialDa
         }
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.message || "Failed to publish"}`);
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          alert(`Validation Error:\n${errorData.errors.join("\n")}`);
+        } else {
+          alert(`Error: ${errorData.message || "Failed to publish"}`);
+        }
       }
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Network error: Could not reach the server.");
+      alert(error instanceof Error ? error.message : "Network error: Could not reach the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -1010,8 +1013,6 @@ export default function ExamNotificationForm({ initialData = null }: { initialDa
       </div>
 
       <form onSubmit={handleSubmit} style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px" }}>
-        {isLoadingDiscovery && <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: "#0f1e35", border: "1px solid #1e3a5f", color: "#93c5fd" }}>Loading discovered exam data...</div>}
-        {discoveryError && <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: "#2a1215", border: "1px solid #7f1d1d", color: "#fecaca" }}>{discoveryError}</div>}
         {isLoadingDiscovery && <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: "#0f1e35", border: "1px solid #1e3a5f", color: "#93c5fd" }}>Loading discovered exam data...</div>}
         {discoveryError && <div style={{ marginBottom: 16, padding: "12px 14px", borderRadius: 8, background: "#2a1215", border: "1px solid #7f1d1d", color: "#fecaca" }}>{discoveryError}</div>}
 
@@ -1139,11 +1140,3 @@ export default function ExamNotificationForm({ initialData = null }: { initialDa
     </div>
   );
 }
-
-
-
-
-
-
-
-

@@ -1,13 +1,9 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-import { CheckCircle2, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
+import { Sparkles, Mail, Lock, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { API_BASE } from './utils/api';
-
-type SignInResponse = {
-  message?: string;
-  token?: string;
-};
 
 type FormProps = {
   signInEndpoint?: string;
@@ -16,369 +12,250 @@ type FormProps = {
   onSuccess?: () => void;
 };
 
-type FormDataState = {
-  email: string;
-  password: string;
-  remember: boolean;
-};
+const Form: React.FC<FormProps> = ({ onSuccess }) => {
+  const [formData, setFormData] = useState({ email: '', password: '', remember: false });
+  const [status, setStatus] = useState({ loading: false, error: '', success: '' });
+  const navigate = useNavigate();
 
-type StatusState = {
-  loading: boolean;
-  error: string;
-  success: string;
-};
-
-const Form: React.FC<FormProps> = ({
-  signInEndpoint = 'http://localhost:3000/api/users/login',
-  onOpenSignup,
-  onForgotPassword,
-  onSuccess,
-}) => {
-  const [formData, setFormData] = useState<FormDataState>({
-    email: '',
-    password: '',
-    remember: false,
-  });
-
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [status, setStatus] = useState<StatusState>({
-    loading: false,
-    error: '',
-    success: '',
-  });
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    setStatus({
-      loading: true,
-      error: '',
-      success: '',
-    });
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setStatus({ loading: true, error: '', success: '' });
 
     try {
-      const response = await fetch(signInEndpoint, {
+      const res = await fetch(`${API_BASE}/api/users/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          remember: formData.remember,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
-      const data: SignInResponse & { error?: string } = await response.json().catch(() => ({}));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login failed');
 
-      if (!response.ok) {
-        const errorMsg = data.message || data.error || 'Sign in failed. Please try again.';
-        throw new Error(errorMsg);
-      }
-
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-
-      setStatus({
-        loading: false,
-        error: '',
-        success: data.message || 'Signed in successfully.',
-      });
-
-      if (typeof onSuccess === 'function') {
-        setTimeout(() => {
-          onSuccess();
-        }, 1200);
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Something went wrong.';
-      setStatus({
-        loading: false,
-        error: message,
-        success: '',
-      });
+      localStorage.setItem('token', data.token);
+      setStatus({ loading: false, error: '', success: 'Welcome back!' });
+      
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+        else navigate('/dashboard');
+      }, 1500);
+    } catch (err: any) {
+      setStatus({ loading: false, error: err.message, success: '' });
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setStatus({ loading: true, error: '', success: '' });
     try {
-      const response = await fetch(`${API_BASE}/api/users/google-login`, {
+      const res = await fetch(`${API_BASE}/api/users/google-login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: credentialResponse.credential,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential }),
       });
 
-      const data = await response.json().catch(() => ({}));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Google authentication failed');
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Google authentication failed.');
-      }
-
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-
-      setStatus({
-        loading: false,
-        error: '',
-        success: 'Signed in with Google!',
-      });
-
-      if (typeof onSuccess === 'function') {
-        setTimeout(() => {
-          onSuccess();
-        }, 1200);
-      }
-    } catch (error) {
-      setStatus({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Google authentication failed.',
-        success: '',
-      });
+      localStorage.setItem('token', data.token);
+      setStatus({ loading: false, error: '', success: 'Access Granted!' });
+      
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+        else navigate('/dashboard');
+      }, 1500);
+    } catch (err: any) {
+      setStatus({ loading: false, error: err.message, success: '' });
     }
-  };
-
-  const handleSignupClick = () => {
-    if (onOpenSignup) {
-      onOpenSignup();
-      return;
-    }
-    window.location.href = '/signup';
-  };
-
-  const handleForgotPasswordClick = () => {
-    if (onForgotPassword) {
-      onForgotPassword();
-      return;
-    }
-    window.location.href = '/forgot-password';
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#020617] font-sans text-slate-100 selection:bg-cyan-500/30 overflow-hidden">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/15 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] flex items-center justify-center p-4 selection:bg-cyan-500/30">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-10%] left-[-10%] h-[50%] w-[50%] rounded-full bg-cyan-600/10 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] h-[50%] w-[50%] rounded-full bg-blue-600/10 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
       </div>
-      <div className="w-full lg:w-1/2 relative flex flex-col justify-center px-8 py-16 lg:px-16 xl:px-24 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5">
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
+      <div className="relative z-10 grid w-full max-w-6xl gap-16 lg:grid-cols-2 lg:items-center">
+        
+        {/* Branding Section */}
         <motion.div 
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-lg mx-auto lg:mx-0 relative z-10"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="hidden lg:block space-y-10"
         >
-          <div className="flex items-center justify-center lg:justify-start space-x-3 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+          <div className="flex items-center gap-4 group">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-[0_0_30px_rgba(34,211,238,0.3)] group-hover:scale-110 transition-all duration-500">
+              <Sparkles className="h-7 w-7 text-white" />
             </div>
-            <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-white">Eligify</h1>
+            <span className="text-4xl font-black tracking-tighter text-white">Eligify</span>
           </div>
-          
-          <h2 className="text-3xl lg:text-5xl font-extrabold tracking-tight mb-6 text-center lg:text-left leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-cyan-400">
-            Seamless access to your personalized exam hub.
-          </h2>
-          <p className="text-base lg:text-lg text-slate-400 text-center lg:text-left leading-relaxed">
-            Eligify helps you discover, track, and prepare for academic and professional exams with intelligent tracking and comprehensive mock tests.
-          </p>
+
+          <div className="space-y-6">
+            <h1 className="text-6xl font-black leading-[1.1] tracking-tight text-white xl:text-7xl">
+              Welcome <br />
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">Back to Center.</span>
+            </h1>
+            <p className="text-xl text-slate-400 leading-relaxed max-w-lg font-medium">
+              Continue your preparation with the most advanced eligibility engine in the industry.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-6">
+             <div className="flex -space-x-3">
+               {[1,2,3,4].map(i => (
+                 <div key={i} className="h-10 w-10 rounded-full border-2 border-[#020617] bg-slate-800" />
+               ))}
+             </div>
+             <p className="text-sm text-slate-400 font-semibold tracking-wide">
+               Trusted by <span className="text-cyan-400">10k+</span> active candidates
+             </p>
+          </div>
         </motion.div>
-      </div>
 
-      <div className="w-full lg:w-1/2 flex flex-col justify-center p-6 sm:p-12 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative w-full max-w-md mx-auto bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 sm:p-10 shadow-[0_20px_60px_rgba(2,6,23,0.45)]"
+        {/* Login Card Section */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mx-auto w-full max-w-[480px]"
         >
-          <div className="mb-8 text-center sm:text-left">
-            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">Welcome Back</h3>
-            <p className="text-sm text-slate-400">Sign in to continue to your account.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="email">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                  </svg>
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
-                />
-              </div>
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-slate-900/40 p-8 shadow-[0_40px_100px_rgba(0,0,0,0.5)] backdrop-blur-3xl sm:p-12">
+            
+            <div className="absolute top-0 left-0 h-32 w-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="mb-10 text-center lg:text-left">
+              <h2 className="text-4xl font-black text-white tracking-tight">Sign In</h2>
+              <p className="mt-3 text-slate-400 font-medium">Access your personalized exam hub.</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="password">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                   <svg className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="Email Address"
+                    className="w-full rounded-2xl border border-white/5 bg-slate-950/40 py-4.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400/50 focus:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                    onChange={handleChange}
+                  />
                 </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  {showPassword ? (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
+
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    placeholder="Enter Password"
+                    className="w-full rounded-2xl border border-white/5 bg-slate-950/40 py-4.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400/50 focus:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between px-1">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input 
+                    type="checkbox" 
+                    name="remember" 
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-white/10 bg-slate-950/50 text-cyan-500 focus:ring-offset-slate-900" 
+                  />
+                  <span className="text-xs font-bold text-slate-400 group-hover:text-slate-300 transition-colors">Remember Me</span>
+                </label>
+                <button type="button" className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors">
+                  Reset Password?
                 </button>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between mt-4">
-              <label className="flex items-center space-x-2 cursor-pointer group">
-                <div className="relative flex items-center">
-                  <input
-                    name="remember"
-                    type="checkbox"
-                    onChange={handleChange}
-                    className="appearance-none w-4 h-4 border border-white/20 rounded bg-slate-900 checked:bg-cyan-500 checked:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-slate-900 transition-colors"
-                  />
-                  <svg className="absolute w-3 h-3 text-slate-950 left-0.5 top-0.5 pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">Remember me</span>
-              </label>
+              <AnimatePresence mode="wait">
+                {status.error && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-xs font-bold text-rose-400 bg-rose-400/10 p-3 rounded-xl border border-rose-400/20 text-center">
+                      {status.error}
+                    </p>
+                  </motion.div>
+                )}
+                {status.success && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="overflow-hidden"
+                  >
+                    <p className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-400/10 p-3 rounded-xl border border-emerald-400/20 text-center">
+                      <CheckCircle2 className="h-4 w-4" /> {status.success}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <button
-                type="button"
-                onClick={handleForgotPasswordClick}
-                className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors focus:outline-none cursor-pointer"
+                type="submit"
+                disabled={status.loading || !!status.success}
+                className="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-600 py-4.5 text-sm font-black text-slate-950 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_15px_30px_rgba(34,211,238,0.25)]"
               >
-                Forgot password?
+                <div className="flex items-center justify-center gap-2">
+                  {status.loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : status.success ? (
+                    'Redirecting...'
+                  ) : (
+                    <>
+                      Sign In to Account
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </div>
               </button>
-            </div>
+            </form>
 
-            {status.error && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-sm text-rose-400 mt-4 flex items-center gap-2">
-                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {status.error}
+            <div className="relative my-10">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
               </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={status.loading || !!status.success}
-              className={`w-full flex justify-center py-3 px-4 border border-transparent shadow-[0_0_20px_rgba(34,211,238,0.2)] text-sm font-bold text-slate-950 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all duration-500 transform cursor-pointer mt-6 ${
-                status.success 
-                  ? 'bg-emerald-400 hover:bg-emerald-300 focus:ring-emerald-400 rounded-full scale-[1.02]' 
-                  : 'bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 focus:ring-cyan-400 rounded-xl hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed'
-              }`}
-            >
-              {status.success ? (
-                <div className="flex items-center gap-2 animate-in zoom-in duration-300">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span>Success</span>
-                </div>
-              ) : status.loading ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Authenticating...</span>
-                </div>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-
-            <div className="mt-8">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/5"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-3 bg-slate-950 rounded-full text-slate-500 border border-white/10 text-[9px] uppercase tracking-[0.2em] font-bold">Or continue with</span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-center">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => {
-                    setStatus({
-                      loading: false,
-                      error: 'Google Login Failed. Please try again.',
-                      success: '',
-                    });
-                  }}
-                  theme="filled_blue"
-                  shape="pill"
-                  width="100%"
-                  text="continue_with"
-                />
+              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em]">
+                <span className="bg-[#0b1325] px-4 text-slate-500">Fast Access With</span>
               </div>
             </div>
 
-            <div className="mt-8 text-center sm:mt-10">
-              <p className="text-sm text-slate-400">
-                Don&apos;t have an account?{' '}
-                <button
-                  type="button"
-                  onClick={handleSignupClick}
-                  className="font-medium text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
-                >
-                  Sign Up
-                </button>
+            <div className="flex flex-col items-center gap-6">
+              <div className="w-full flex justify-center">
+                <div className="scale-110 hover:scale-115 transition-transform duration-300">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setStatus({ loading: false, error: 'Google Login Failed', success: '' })}
+                    useOneTap
+                    shape="pill"
+                    theme="filled_black"
+                    text="signin_with"
+                  />
+                </div>
+              </div>
+
+              <p className="text-center text-sm font-medium text-slate-400">
+                New to Eligify?{' '}
+                <Link to="/signup" className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-4 decoration-cyan-400/30">
+                  Create Account
+                </Link>
               </p>
             </div>
-          </form>
+          </div>
         </motion.div>
       </div>
     </div>

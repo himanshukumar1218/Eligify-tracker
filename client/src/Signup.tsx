@@ -1,211 +1,252 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
-import { CheckCircle2, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
+import { Sparkles, Mail, Lock, User, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { API_BASE } from './utils/api';
 
-type SignupResponse = {
-  message?: string;
-  token?: string;
-};
+const Signup: React.FC = () => {
+  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [status, setStatus] = useState({ loading: false, error: '', success: '' });
+  const navigate = useNavigate();
 
-type SignupProps = {
-  signupEndpoint?: string;
-  onOpenLogin?: () => void;
-  onSuccess?: () => void;
-};
-
-type SignupFormState = {
-  username: string;
-  email: string;
-  password: string;
-};
-
-type StatusState = {
-  loading: boolean;
-  error: string;
-  success: string;
-};
-
-const Signup: React.FC<SignupProps> = ({
-  signupEndpoint = 'http://localhost:3000/api/users/signup',
-  onOpenLogin,
-  onSuccess,
-}) => {
-  const [formData, setFormData] = useState<SignupFormState>({
-    username: '',
-    email: '',
-    password: '',
-  });
-
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [status, setStatus] = useState<StatusState>({
-    loading: false,
-    error: '',
-    success: '',
-  });
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     setStatus({ loading: true, error: '', success: '' });
+
     try {
-      const response = await fetch(signupEndpoint, {
+      const res = await fetch(`${API_BASE}/api/users/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      const data: SignupResponse = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error((data as any).message || (data as any).error || 'Signup failed.');
-      }
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-      setStatus({ loading: false, error: '', success: data.message || 'Success!' });
-      if (onSuccess) setTimeout(onSuccess, 1200);
-    } catch (error) {
-      setStatus({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Something went wrong.',
-        success: '',
-      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+      localStorage.setItem('token', data.token);
+      setStatus({ loading: false, error: '', success: 'Account created successfully!' });
+      
+      setTimeout(() => navigate('/student-details'), 1500);
+    } catch (err: any) {
+      setStatus({ loading: false, error: err.message, success: '' });
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setStatus({ loading: true, error: '', success: '' });
     try {
-      const response = await fetch(`${API_BASE}/api/users/google-login`, {
+      const res = await fetch(`${API_BASE}/api/users/google-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.message || 'Google signup failed.');
-      if (data.token) localStorage.setItem('token', data.token);
-      setStatus({ loading: false, error: '', success: 'Account created with Google!' });
-      if (onSuccess) setTimeout(onSuccess, 1200);
-    } catch (error) {
-      setStatus({
-        loading: false,
-        error: error instanceof Error ? error.message : 'Google authentication failed.',
-        success: '',
-      });
-    }
-  };
 
-  const handleLoginClick = () => {
-    if (onOpenLogin) {
-      onOpenLogin();
-      return;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Google authentication failed');
+
+      localStorage.setItem('token', data.token);
+      setStatus({ loading: false, error: '', success: 'Welcome to Eligify!' });
+      
+      setTimeout(() => navigate('/dashboard'), 1500);
+    } catch (err: any) {
+      setStatus({ loading: false, error: err.message, success: '' });
     }
-    window.location.href = '/';
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/30 overflow-hidden">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/15 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
-      </div>
-      <div className="w-full lg:w-1/2 relative flex flex-col justify-center px-8 py-12 lg:px-12 xl:px-24 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5">
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-lg mx-auto lg:mx-0 relative z-10"
-        >
-          <div className="flex items-center justify-center lg:justify-start space-x-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-extrabold tracking-tight text-white">Eligify</h1>
-          </div>
-          <h2 className="text-3xl lg:text-5xl font-extrabold tracking-tight mb-8 text-center lg:text-left text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-cyan-400">
-            Welcome to the future of exam tracking.
-          </h2>
-          <ul className="space-y-4 lg:space-y-5 flex flex-col items-center lg:items-start w-full text-slate-300">
-             <li className="flex items-center space-x-3"><span>Find exams</span></li>
-             <li className="flex items-center space-x-3"><span>Track deadlines</span></li>
-             <li className="flex items-center space-x-3"><span>Mock tests</span></li>
-          </ul>
-        </motion.div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] flex items-center justify-center p-4 selection:bg-cyan-500/30">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-10%] left-[-10%] h-[50%] w-[50%] rounded-full bg-cyan-600/10 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] h-[50%] w-[50%] rounded-full bg-blue-600/10 blur-[120px] animate-pulse" style={{ animationDuration: '10s' }} />
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="relative z-10 grid w-full max-w-6xl gap-16 lg:grid-cols-2 lg:items-center">
         
+        {/* Branding & Value Prop Section */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 sm:p-10 shadow-[0_20px_60px_rgba(2,6,23,0.45)]"
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="hidden lg:block space-y-10"
         >
-          <div className="mb-8 text-center sm:text-left">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Create an account</h2>
-            <p className="text-sm text-slate-400">Enter your details to get started.</p>
+          <div className="flex items-center gap-4 group">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-[0_0_30px_rgba(34,211,238,0.3)] group-hover:scale-110 transition-all duration-500">
+              <Sparkles className="h-7 w-7 text-white" />
+            </div>
+            <span className="text-4xl font-black tracking-tighter text-white">Eligify</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="username">Username</label>
-              <input
-                id="username" name="username" type="text" required value={formData.username} onChange={handleChange}
-                className="block w-full px-4 py-3 border border-white/10 rounded-xl bg-slate-950/50 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="email">Email</label>
-              <input
-                id="email" name="email" type="email" required value={formData.email} onChange={handleChange}
-                className="block w-full px-4 py-3 border border-white/10 rounded-xl bg-slate-950/50 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5" htmlFor="password">Password</label>
-              <input
-                id="password" name="password" type={showPassword ? 'text' : 'password'} required value={formData.password} onChange={handleChange}
-                className="block w-full px-4 py-3 border border-white/10 rounded-xl bg-slate-950/50 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-              />
+          <div className="space-y-6">
+            <h1 className="text-6xl font-black leading-[1.05] tracking-tight text-white xl:text-7xl">
+              Start Your <br />
+              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">Journey Now.</span>
+            </h1>
+            <p className="text-xl text-slate-400 leading-relaxed max-w-lg font-medium">
+              Join the elite circle of students leveraging our intelligence engine to secure their futures.
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {[
+              { text: "Predictive Eligibility Engine", color: "bg-cyan-400" },
+              { text: "Dynamic Exam Roadmaps", color: "bg-blue-400" },
+              { text: "Smart Deadline Guardian", color: "bg-indigo-400" }
+            ].map((item, i) => (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + (i * 0.1) }}
+                className="flex items-center gap-4 text-slate-200"
+              >
+                <div className={`h-2 w-2 rounded-full ${item.color} shadow-[0_0_10px_currentColor]`} />
+                <span className="text-base font-semibold tracking-wide">{item.text}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Signup Card Section */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="mx-auto w-full max-w-[480px]"
+        >
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-slate-900/40 p-8 shadow-[0_40px_100px_rgba(0,0,0,0.5)] backdrop-blur-3xl sm:p-12">
+            
+            <div className="absolute top-0 right-0 h-32 w-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="mb-10 text-center lg:text-left">
+              <h2 className="text-4xl font-black text-white tracking-tight">Create Account</h2>
+              <p className="mt-3 text-slate-400 font-medium">Enter your details to get started.</p>
             </div>
 
-            <button
-              type="submit" disabled={status.loading || !!status.success}
-              className="w-full py-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl font-bold text-slate-950 mt-4"
-            >
-              {status.loading ? 'Creating...' : status.success ? 'Success!' : 'Sign Up'}
-            </button>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                  <input
+                    name="username"
+                    type="text"
+                    required
+                    placeholder="Preferred Username"
+                    className="w-full rounded-2xl border border-white/5 bg-slate-950/40 py-4.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400/50 focus:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                    onChange={handleChange}
+                  />
+                </div>
 
-            <div className="mt-8">
-              <div className="relative flex justify-center text-sm mb-4">
-                <span className="px-2 bg-slate-950 text-slate-500">Or continue with</span>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="Your Email Address"
+                    className="w-full rounded-2xl border border-white/5 bg-slate-950/40 py-4.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400/50 focus:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    placeholder="Secure Password"
+                    className="w-full rounded-2xl border border-white/5 bg-slate-950/40 py-4.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400/50 focus:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setStatus({ loading: false, error: 'Failed', success: '' })}
-                theme="filled_blue" shape="pill" width="100%" text="signup_with"
-              />
+
+              <AnimatePresence mode="wait">
+                {status.error && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-xs font-bold text-rose-400 bg-rose-400/10 p-3 rounded-xl border border-rose-400/20 text-center">
+                      {status.error}
+                    </p>
+                  </motion.div>
+                )}
+                {status.success && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="overflow-hidden"
+                  >
+                    <p className="flex items-center justify-center gap-2 text-xs font-bold text-emerald-400 bg-emerald-400/10 p-3 rounded-xl border border-emerald-400/20">
+                      <CheckCircle2 className="h-4 w-4" /> {status.success}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <button
+                type="submit"
+                disabled={status.loading || !!status.success}
+                className="group relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-600 py-4.5 text-sm font-black text-slate-950 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 shadow-[0_15px_30px_rgba(34,211,238,0.25)]"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {status.loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Initializing...
+                    </>
+                  ) : status.success ? (
+                    'Redirecting...'
+                  ) : (
+                    <>
+                      Create Free Account
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </div>
+              </button>
+            </form>
+
+            <div className="relative my-10">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em]">
+                <span className="bg-[#0b1325] px-4 text-slate-500">Or Securely Join With</span>
+              </div>
             </div>
 
-            <div className="mt-8 text-center">
-              <p className="text-sm text-slate-400">
-                Already have an account? <button type="button" onClick={handleLoginClick} className="text-cyan-400">Login</button>
+            <div className="flex flex-col items-center gap-6">
+              <div className="w-full flex justify-center">
+                <div className="scale-110 hover:scale-115 transition-transform duration-300">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setStatus({ loading: false, error: 'Google Authentication Failed', success: '' })}
+                    useOneTap
+                    shape="pill"
+                    theme="filled_black"
+                    text="continue_with"
+                  />
+                </div>
+              </div>
+
+              <p className="text-center text-sm font-medium text-slate-400">
+                Already part of Eligify?{' '}
+                <Link to="/login" className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-4 decoration-cyan-400/30">
+                  Log in here
+                </Link>
               </p>
             </div>
-          </form>
+          </div>
         </motion.div>
       </div>
     </div>

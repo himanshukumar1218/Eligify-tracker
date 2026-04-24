@@ -85,9 +85,8 @@ const Form: React.FC<FormProps> = ({
         throw new Error(errorMsg);
       }
 
-      // 1. TOKEN ALGO: Save the JWT to the browser's storage
       if (data.token) {
-        localStorage.setItem('token', data.token); //
+        localStorage.setItem('token', data.token);
       }
 
       setStatus({
@@ -96,16 +95,20 @@ const Form: React.FC<FormProps> = ({
         success: data.message || 'Signed in successfully.',
       });
 
-      console.log('Sign in response:', data);
-      console.log("Type of onSuccess:", typeof onSuccess);
-      // 2. NAVIGATION: Trigger the redirect callback to /student-details after animation
       if (typeof onSuccess === 'function') {
         setTimeout(() => {
           onSuccess();
         }, 1200);
-      } else {
-        console.error("onSuccess is NOT a function! Check App.tsx props.");
       }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong.';
+      setStatus({
+        loading: false,
+        error: message,
+        success: '',
+      });
+    }
+  };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setStatus({ loading: true, error: '', success: '' });
@@ -155,7 +158,6 @@ const Form: React.FC<FormProps> = ({
       onOpenSignup();
       return;
     }
-
     window.location.href = '/signup';
   };
 
@@ -164,20 +166,16 @@ const Form: React.FC<FormProps> = ({
       onForgotPassword();
       return;
     }
-
     window.location.href = '/forgot-password';
   };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#020617] font-sans text-slate-100 selection:bg-cyan-500/30 overflow-hidden">
-      {/* Global Background Glows */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/15 blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
       </div>
-      {/* Left Side - Branding */}
       <div className="w-full lg:w-1/2 relative flex flex-col justify-center px-8 py-16 lg:px-16 xl:px-24 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5">
-        {/* Local Background Effects */}
         <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -205,9 +203,7 @@ const Form: React.FC<FormProps> = ({
         </motion.div>
       </div>
 
-      {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center p-6 sm:p-12 relative overflow-hidden">
-        {/* Subtle background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
         <motion.div 
@@ -272,7 +268,7 @@ const Form: React.FC<FormProps> = ({
                 >
                   {showPassword ? (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" />
                     </svg>
                   ) : (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

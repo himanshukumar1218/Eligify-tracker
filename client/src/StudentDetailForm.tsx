@@ -17,6 +17,7 @@ const {
 } = ((types as any).default || types) as typeof types;
 import { getEligibilityReadiness } from './utils/profileReadiness';
 import Loader from './components/ui/Loader';
+import CustomDropdown from './components/ui/CustomDropdown';
 
 type Qualification = (typeof QUALIFICATION_LEVELS)[number];
 type Gender = (typeof GENDERS)[number];
@@ -653,38 +654,52 @@ const StudentDetailFormDashboard: React.FC = () => {
               >
                 {currentStep === 0 && (
               <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Full Name *" htmlFor="fullName" span={2}>
-                  <input id="fullName" title="Full Name" className={inputClasses} value={formData.basic.fullName} onChange={(e) => updateField('basic', 'fullName', e.target.value)} placeholder="Full Name" />
+                <Field label="Full Name" htmlFor="fullName">
+                  <input id="fullName" name="fullName" title="Full Name" className={inputClasses} value={formData.basic.fullName} onChange={(e) => handleInputChange('basic', 'fullName', e.target.value)} placeholder="e.g. John Doe" />
                 </Field>
-                <Field label="Date of Birth *" htmlFor="dob">
-                  <input id="dob" title="Date of Birth" type="date" className={inputClasses} value={formData.basic.dob} onChange={(e) => updateField('basic', 'dob', e.target.value)} />
+                <Field label="Date of Birth" htmlFor="dob">
+                  <input id="dob" name="dob" type="date" title="Date of Birth" className={inputClasses} value={formData.basic.dob} onChange={(e) => handleInputChange('basic', 'dob', e.target.value)} />
+                </Field>
+                <Field label="Gender" htmlFor="gender">
+                  <CustomDropdown
+                    options={[{ value: '', label: 'Select Gender' }, ...GENDERS.map(g => ({ value: g, label: g.charAt(0).toUpperCase() + g.slice(1).replace(/_/g, ' ') }))]}
+                    value={formData.basic.gender}
+                    onChange={(val) => updateField('basic', 'gender', val)}
+                  />
+                </Field>
+                <Field label="Category" htmlFor="category">
+                  <CustomDropdown
+                    options={[{ value: '', label: 'Select Category' }, ...CATEGORIES.map(c => ({ value: c, label: c }))]}
+                    value={formData.basic.category}
+                    onChange={(val) => updateField('basic', 'category', val)}
+                  />
+                </Field>
+                <Field label="Domicile State" htmlFor="domicile">
+                  <CustomDropdown
+                    options={[{ value: '', label: 'Select State' }, ...DOMICILE_STATES.map(s => ({ value: s, label: s }))]}
+                    value={formData.basic.domicile}
+                    onChange={(val) => updateField('basic', 'domicile', val)}
+                  />
+                </Field>
+                <Field label="PwD Status (Disabled?)" htmlFor="isPwD">
+                  <CustomDropdown
+                    options={[
+                      { value: '', label: 'Select' },
+                      { value: 'true', label: 'Yes' },
+                      { value: 'false', label: 'No' }
+                    ]}
+                    value={formData.basic.isPwD}
+                    onChange={(val) => updateField('basic', 'isPwD', val)}
+                  />
                 </Field>
                 <Field label="Phone *" htmlFor="phone">
                   <input id="phone" title="Phone Number" type="tel" className={inputClasses} value={formData.basic.phone} onChange={(e) => updateField('basic', 'phone', e.target.value)} placeholder="Valid phone number" />
-                </Field>
-                <Field label="Gender" htmlFor="gender">
-                  <select id="gender" title="Gender" className={inputClasses} value={formData.basic.gender} onChange={(e) => updateField('basic', 'gender', e.target.value)}>
-                    <option value="">Select Gender</option>{genderOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                </Field>
-                <Field label="Category" htmlFor="category">
-                  <select id="category" title="Category" className={inputClasses} value={formData.basic.category} onChange={(e) => updateField('basic', 'category', e.target.value)}>
-                    <option value="">Select Category</option>{categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                </Field>
-                <Field label="PwD Status" htmlFor="isPwD">
-                  <select id="isPwD" title="PwD Status" className={inputClasses} value={formData.basic.isPwD} onChange={(e) => updateField('basic', 'isPwD', e.target.value)}>
-                    <option value="">Are you a Person with Disability?</option><option value="false">No</option><option value="true">Yes</option>
-                  </select>
                 </Field>
                 <Field label="PIN Code" htmlFor="pinCode" helper={lookupState.loading ? 'Fetching state details...' : lookupState.error}>
                   <input id="pinCode" title="PIN Code" maxLength={6} className={inputClasses} value={formData.basic.pinCode} onChange={(e) => updateField('basic', 'pinCode', e.target.value)} placeholder="6-digit PIN" />
                 </Field>
                 <Field label="District" htmlFor="district">
                   <input id="district" className={inputClasses} value={formData.basic.district} onChange={(e) => updateField('basic', 'district', e.target.value)} />
-                </Field>
-                <Field label="Domicile (State)" htmlFor="domicile">
-                  <input id="domicile" title="Domicile State" className={inputClasses} value={formData.basic.domicile} onChange={(e) => updateField('basic', 'domicile', e.target.value)} placeholder="State of permanent residence" />
                 </Field>
                 <Field label="Nationality" htmlFor="nationality">
                   <input id="nationality" title="Nationality" className={inputClasses} value={formData.basic.nationality} onChange={(e) => updateField('basic', 'nationality', e.target.value)} />
@@ -694,18 +709,25 @@ const StudentDetailFormDashboard: React.FC = () => {
 
             {currentStep === 1 && (
               <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Highest Qualification *" htmlFor="highestQualification" span={2}>
-                  <select id="highestQualification" name="highestQualification" title="Highest Qualification" className={inputClasses} value={formData.academic.highestQualification} onChange={(e) => updateField('academic', 'highestQualification', e.target.value)}>
-                    <option value="">Select Qualification</option>{qualificationOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
+                <Field label="Highest Qualification" htmlFor="highestQualification" span={2}>
+                  <CustomDropdown
+                    options={[
+                      { value: '', label: 'Select Qualification' },
+                      ...QUALIFICATION_LEVELS.map(q => ({ value: q, label: q.charAt(0).toUpperCase() + q.slice(1).replace(/_/g, ' ') }))
+                    ]}
+                    value={formData.academic.highestQualification}
+                    onChange={(val) => updateField('academic', 'highestQualification', val)}
+                  />
                 </Field>
 
                 {visibleAcademicFields.includes('tenthPercentage') && (
                   <>
                     <Field label="10th Board" htmlFor="tenthBoard" span={2}>
-                      <select id="tenthBoard" name="tenthBoard" title="10th Board" className={inputClasses} value={getSelectValue(formData.academic.tenthBoard, boardOptions, 'tenthBoard')} onChange={(e) => handleAcademicSelectWithOther('tenthBoard', e.target.value)}>
-                        <option value="">Select Board</option>{boardOptions.map((b: string) => <option key={b} value={b}>{b}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select Board' }, ...SCHOOL_BOARDS.map(b => ({ value: b, label: b }))]}
+                        value={formData.academic.tenthBoard}
+                        onChange={(val) => updateField('academic', 'tenthBoard', val)}
+                      />
                       {shouldShowCustomInput(formData.academic.tenthBoard, boardOptions, 'tenthBoard') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.tenthBoard} onChange={(e) => updateField('academic', 'tenthBoard', e.target.value)} placeholder="Enter board name" />
                       ) : null}
@@ -718,17 +740,21 @@ const StudentDetailFormDashboard: React.FC = () => {
                 {visibleAcademicFields.includes('twelfthBoard') && (
                   <>
                     <Field label="12th Board" htmlFor="twelfthBoard">
-                      <select id="twelfthBoard" name="twelfthBoard" title="12th Board" className={inputClasses} value={getSelectValue(formData.academic.twelfthBoard, boardOptions, 'twelfthBoard')} onChange={(e) => handleAcademicSelectWithOther('twelfthBoard', e.target.value)}>
-                        <option value="">Select Board</option>{boardOptions.map((b: string) => <option key={b} value={b}>{b}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select Board' }, ...boardOptions.map(b => ({ value: b, label: b })), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.academic.twelfthBoard, boardOptions, 'twelfthBoard')}
+                        onChange={(val) => handleAcademicSelectWithOther('twelfthBoard', val)}
+                      />
                       {shouldShowCustomInput(formData.academic.twelfthBoard, boardOptions, 'twelfthBoard') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.twelfthBoard} onChange={(e) => updateField('academic', 'twelfthBoard', e.target.value)} placeholder="Enter board name" />
                       ) : null}
                     </Field>
                     <Field label="12th Stream" htmlFor="twelfthStream">
-                      <select id="twelfthStream" name="twelfthStream" title="12th Stream" className={inputClasses} value={getSelectValue(formData.academic.twelfthStream, coursesData.intermediate['12th Standard'], 'twelfthStream')} onChange={(e) => handleAcademicSelectWithOther('twelfthStream', e.target.value)}>
-                        <option value="">Select Stream</option>{coursesData.intermediate['12th Standard'].map((s: string) => <option key={s} value={s}>{s}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select Stream' }, ...coursesData.intermediate['12th Standard'].map(s => ({ value: s, label: s })), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.academic.twelfthStream, coursesData.intermediate['12th Standard'], 'twelfthStream')}
+                        onChange={(val) => handleAcademicSelectWithOther('twelfthStream', val)}
+                      />
                       {shouldShowCustomInput(formData.academic.twelfthStream, coursesData.intermediate['12th Standard'], 'twelfthStream') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.twelfthStream} onChange={(e) => updateField('academic', 'twelfthStream', e.target.value)} placeholder="Enter stream name" />
                       ) : null}
@@ -759,18 +785,6 @@ const StudentDetailFormDashboard: React.FC = () => {
                     <h3 className="col-span-1 md:col-span-2 mt-4 text-sm font-bold text-cyan-300 border-b border-white/5 pb-2">
                       {qualification === 'postgraduate' ? 'Postgraduate Degree Details' : 'Degree Details'}
                     </h3>
-                    <Field label="Programme / Course" htmlFor="programme">
-                      <select id="programme" name="programme" title="Programme or Course" className={inputClasses} value={getSelectValue(formData.academic.programme, qualification && coursesData[qualification] ? Object.keys(coursesData[qualification]) : [], 'programme')} onChange={(e) => handleAcademicSelectWithOther('programme', e.target.value)}>
-                        <option value="">Select Programme</option>{qualification && coursesData[qualification] && Object.keys(coursesData[qualification]).map((p) => <option key={p} value={p}>{p}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
-                      {shouldShowCustomInput(formData.academic.programme, qualification && coursesData[qualification] ? Object.keys(coursesData[qualification]) : [], 'programme') ? (
-                        <input className={`${inputClasses} mt-3`} value={formData.academic.programme} onChange={(e) => updateField('academic', 'programme', e.target.value)} placeholder="Enter programme name" />
-                      ) : null}
-                    </Field>
-                    <Field label="Branch / Stream" htmlFor="branch">
-                      <select id="branch" name="branch" title="Branch or Stream" className={inputClasses} value={getSelectValue(formData.academic.branch, qualification && formData.academic.programme && coursesData[qualification]?.[formData.academic.programme] ? coursesData[qualification][formData.academic.programme] : [], 'branch')} onChange={(e) => handleAcademicSelectWithOther('branch', e.target.value)} disabled={!formData.academic.programme}>
-                        <option value="">Select Branch</option>{qualification && formData.academic.programme && coursesData[qualification]?.[formData.academic.programme]?.map((b) => <option key={b} value={b}>{b}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
                       {shouldShowCustomInput(formData.academic.branch, qualification && formData.academic.programme && coursesData[qualification]?.[formData.academic.programme] ? coursesData[qualification][formData.academic.programme] : [], 'branch') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.branch} onChange={(e) => updateField('academic', 'branch', e.target.value)} placeholder="Enter branch name" />
                       ) : null}
@@ -781,9 +795,11 @@ const StudentDetailFormDashboard: React.FC = () => {
 
                 {visibleAcademicFields.includes('graduationStatus') && (
                   <Field label="Graduation Status" htmlFor="graduationStatus">
-                    <select id="graduationStatus" name="graduationStatus" title="Graduation Status" className={inputClasses} value={formData.academic.graduationStatus} onChange={(e) => updateField('academic', 'graduationStatus', e.target.value)}>
-                      <option value="">Select Status</option>{GRADUATION_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
-                    </select>
+                    <CustomDropdown
+                      options={[{ value: '', label: 'Select Status' }, ...GRADUATION_STATUSES.map(s => ({ value: s, label: s }))]}
+                      value={formData.academic.graduationStatus}
+                      onChange={(val) => updateField('academic', 'graduationStatus', val)}
+                    />
                   </Field>
                 )}
 
@@ -797,17 +813,21 @@ const StudentDetailFormDashboard: React.FC = () => {
                       Undergraduate Degree Details
                     </h3>
                     <Field label="UG Programme" htmlFor="ugProgramme">
-                      <select id="ugProgramme" name="ugProgramme" title="UG Programme" className={inputClasses} value={getSelectValue(formData.academic.ugProgramme, coursesData.undergraduate ? Object.keys(coursesData.undergraduate) : [], 'ugProgramme')} onChange={(e) => handleAcademicSelectWithOther('ugProgramme', e.target.value)}>
-                        <option value="">Select UG Programme</option>{coursesData.undergraduate && Object.keys(coursesData.undergraduate).map((p) => <option key={p} value={p}>{p}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select UG Programme' }, ...Object.keys(coursesData.undergraduate || {}).map(p => ({ value: p, label: p })), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.academic.ugProgramme, coursesData.undergraduate ? Object.keys(coursesData.undergraduate) : [], 'ugProgramme')}
+                        onChange={(val) => handleAcademicSelectWithOther('ugProgramme', val)}
+                      />
                       {shouldShowCustomInput(formData.academic.ugProgramme, coursesData.undergraduate ? Object.keys(coursesData.undergraduate) : [], 'ugProgramme') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.ugProgramme} onChange={(e) => updateField('academic', 'ugProgramme', e.target.value)} placeholder="Enter UG programme" />
                       ) : null}
                     </Field>
                     <Field label="UG Branch" htmlFor="ugBranch">
-                      <select id="ugBranch" name="ugBranch" title="UG Branch" className={inputClasses} value={getSelectValue(formData.academic.ugBranch, formData.academic.ugProgramme && coursesData.undergraduate?.[formData.academic.ugProgramme] ? coursesData.undergraduate[formData.academic.ugProgramme] : [], 'ugBranch')} onChange={(e) => handleAcademicSelectWithOther('ugBranch', e.target.value)} disabled={!formData.academic.ugProgramme}>
-                        <option value="">Select UG Branch</option>{formData.academic.ugProgramme && coursesData.undergraduate?.[formData.academic.ugProgramme]?.map((b: string) => <option key={b} value={b}>{b}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select UG Branch' }, ...(formData.academic.ugProgramme && coursesData.undergraduate?.[formData.academic.ugProgramme] ? coursesData.undergraduate[formData.academic.ugProgramme].map(b => ({ value: b, label: b })) : []), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.academic.ugBranch, formData.academic.ugProgramme && coursesData.undergraduate?.[formData.academic.ugProgramme] ? coursesData.undergraduate[formData.academic.ugProgramme] : [], 'ugBranch')}
+                        onChange={(val) => handleAcademicSelectWithOther('ugBranch', val)}
+                      />
                       {shouldShowCustomInput(formData.academic.ugBranch, formData.academic.ugProgramme && coursesData.undergraduate?.[formData.academic.ugProgramme] ? coursesData.undergraduate[formData.academic.ugProgramme] : [], 'ugBranch') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.academic.ugBranch} onChange={(e) => updateField('academic', 'ugBranch', e.target.value)} placeholder="Enter UG branch" />
                       ) : null}
@@ -843,25 +863,29 @@ const StudentDetailFormDashboard: React.FC = () => {
             {currentStep === 3 && (
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Work Experience?" htmlFor="hasExperience" span={2}>
-                  <select id="hasExperience" name="hasExperience" title="Work Experience" className={inputClasses} value={formData.experience.hasExperience} onChange={(e) => handleInputChange('experience', 'hasExperience', e.target.value)}>
-                    <option value="">Select</option><option value="true">Yes</option><option value="false">No</option>
-                  </select>
+                  <CustomDropdown
+                    options={[{ value: '', label: 'Select' }, { value: 'true', label: 'Yes' }, { value: 'false', label: 'No' }]}
+                    value={formData.experience.hasExperience}
+                    onChange={(val) => handleInputChange('experience', 'hasExperience', val)}
+                  />
                 </Field>
                 {formData.experience.hasExperience === 'true' && (
                   <>
                     <Field label="Years" htmlFor="years"><input id="years" name="years" title="Years of Experience" type="number" className={inputClasses} value={formData.experience.years} onChange={(e) => handleInputChange('experience', 'years', e.target.value)} /></Field>
                     <Field label="Field" htmlFor="experienceField">
-                      <select id="experienceField" name="experienceField" title="Experience Field" className={inputClasses} value={getSelectValue(formData.experience.field, experienceFields, 'experienceField')} onChange={(e) => {
-                        if (e.target.value === OTHER_OPTION) {
-                          setCustomSelection('experienceField', true);
-                          handleInputChange('experience', 'field', '');
-                          return;
-                        }
-                        setCustomSelection('experienceField', false);
-                        handleInputChange('experience', 'field', e.target.value);
-                      }}>
-                        <option value="">Select Field</option>{experienceFields.map((f) => <option key={f} value={f}>{f}</option>)}<option value={OTHER_OPTION}>Other</option>
-                      </select>
+                      <CustomDropdown
+                        options={[{ value: '', label: 'Select Field' }, ...experienceFields.map(f => ({ value: f, label: f })), { value: OTHER_OPTION, label: 'Other' }]}
+                        value={getSelectValue(formData.experience.field, experienceFields, 'experienceField')}
+                        onChange={(val) => {
+                          if (val === OTHER_OPTION) {
+                            setCustomSelection('experienceField', true);
+                            handleInputChange('experience', 'field', '');
+                            return;
+                          }
+                          setCustomSelection('experienceField', false);
+                          handleInputChange('experience', 'field', val);
+                        }}
+                      />
                       {shouldShowCustomInput(formData.experience.field, experienceFields, 'experienceField') ? (
                         <input className={`${inputClasses} mt-3`} value={formData.experience.field} onChange={(e) => handleInputChange('experience', 'field', e.target.value)} placeholder="Enter experience field" />
                       ) : null}
@@ -877,9 +901,11 @@ const StudentDetailFormDashboard: React.FC = () => {
                 <Field label="Weight (kg)" htmlFor="weight"><input id="weight" name="weight" title="Weight in kilograms" className={inputClasses} value={formData.physical.weight} onChange={(e) => handleInputChange('physical', 'weight', e.target.value)} /></Field>
                 <Field label="Chest (cm)" htmlFor="chest"><input id="chest" name="chest" title="Chest in centimeters" className={inputClasses} value={formData.physical.chest} onChange={(e) => handleInputChange('physical', 'chest', e.target.value)} /></Field>
                 <Field label="Physical Fit?" htmlFor="isPhysicalFit">
-                  <select id="isPhysicalFit" name="isPhysicalFit" title="Physical Fit" className={inputClasses} value={formData.physical.isPhysicalFit} onChange={(e) => handleInputChange('physical', 'isPhysicalFit', e.target.value)}>
-                    <option value="">Select</option><option value="true">Yes</option><option value="false">No</option>
-                  </select>
+                  <CustomDropdown
+                    options={[{ value: '', label: 'Select' }, { value: 'true', label: 'Yes' }, { value: 'false', label: 'No' }]}
+                    value={formData.physical.isPhysicalFit}
+                    onChange={(val) => handleInputChange('physical', 'isPhysicalFit', val)}
+                  />
                 </Field>
               </div>
             )}

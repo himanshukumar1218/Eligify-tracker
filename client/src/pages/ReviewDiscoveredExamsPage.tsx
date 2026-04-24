@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/ui/Loader";
 
 type DiscoveryListItem = {
   id: number;
@@ -66,7 +67,7 @@ export default function ReviewDiscoveredExamsPage() {
           </button>
         </div>
 
-        {loading && <div style={{ color: "#94a3b8" }}>Loading review queue...</div>}
+        {loading && <Loader text="Loading review queue" />}
         {error && <div style={{ color: "#fca5a5" }}>{error}</div>}
         {!loading && !error && items.length === 0 && <div style={{ color: "#94a3b8" }}>No discovered exams are waiting for review.</div>}
 

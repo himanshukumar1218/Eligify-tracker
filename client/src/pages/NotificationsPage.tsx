@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, Clock, AlertCircle, CheckCircle2, Info, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE } from '../utils/api';
+import Loader from '../components/ui/Loader';
 
 type Category = 'all' | 'alert' | 'deadline' | 'system';
 
@@ -120,9 +121,7 @@ const NotificationsPage = () => {
       {/* Feed */}
       <div className="space-y-4">
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-400 border-t-transparent" />
-          </div>
+          <Loader text="Fetching Alerts" />
         ) : filteredNotifications.length === 0 ? (
           <div className="rounded-3xl border border-white/5 bg-slate-900/50 p-12 text-center">
             <Bell className="mx-auto h-12 w-12 text-slate-600 mb-4 opacity-50" />

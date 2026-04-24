@@ -6,6 +6,7 @@ import {
   CalendarDays, NotebookPen, Flame, Trophy,
   CheckCircle2, Circle, Zap, Save, FileText
 } from 'lucide-react';
+import Loader from '../components/ui/Loader';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -72,9 +73,8 @@ const ExamSelector: React.FC<{
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/80 px-5 py-3 text-sm text-slate-500 animate-pulse">
-        <Zap className="h-4 w-4" />
-        <span>Loading exams…</span>
+      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/80 px-5 py-2 text-sm text-slate-500">
+        <Loader text="Exams" />
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Target, Zap, Clock, Bell, AlertTriangle, ArrowRight, CheckCircle2, UserCircle } from 'lucide-react';
 import { getEligibilityReadiness, type MissingField } from '../utils/profileReadiness';
 import { API_BASE } from '../utils/api';
+import Loader from '../components/ui/Loader';
 
 // Types
 type ExamRow = {
@@ -108,7 +109,7 @@ const DashboardHomePage: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-10 text-cyan-400 animate-pulse font-semibold tracking-widest uppercase text-sm">Synchronizing Data...</div>;
+    return <Loader text="Synchronizing Data" />;
   }
 
   const isProfileAlmostComplete = profileCompletion.percent >= 90;

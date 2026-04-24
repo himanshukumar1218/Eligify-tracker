@@ -1,6 +1,8 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
+import { API_BASE } from './utils/api';
 
 type SignInResponse = {
   message?: string;
@@ -105,13 +107,44 @@ const Form: React.FC<FormProps> = ({
         console.error("onSuccess is NOT a function! Check App.tsx props.");
       }
 
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Something went wrong.';
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setStatus({ loading: true, error: '', success: '' });
+    try {
+      const response = await fetch(`${API_BASE}/api/users/google-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: credentialResponse.credential,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Google authentication failed.');
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
 
       setStatus({
         loading: false,
-        error: message,
+        error: '',
+        success: 'Signed in with Google!',
+      });
+
+      if (typeof onSuccess === 'function') {
+        setTimeout(() => {
+          onSuccess();
+        }, 1200);
+      }
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error instanceof Error ? error.message : 'Google authentication failed.',
         success: '',
       });
     }
@@ -319,25 +352,21 @@ const Form: React.FC<FormProps> = ({
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-white/5 rounded-xl shadow-sm bg-white/5 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white focus:outline-none transition-all duration-200 cursor-pointer"
-                >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
-                  </svg>
-                  Google
-                </button>
-                <button
-                  type="button"
-                  className="w-full inline-flex justify-center items-center py-2.5 px-4 border border-white/5 rounded-xl shadow-sm bg-white/5 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white focus:outline-none transition-all duration-200 cursor-pointer"
-                >
-                  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.26-.79 3.59-.76 2.05.08 3.4.92 4.09 2.08-2.6 1.4-2.3 4.88.24 6.22-1.09 2.1-2.29 4.19-3 4.63zm-4.75-14.7c-.12-2.26 1.83-4.14 4.07-4.13.25 2.26-2.03 4.1-4.07 4.13z"/>
-                  </svg>
-                  Apple
-                </button>
+              <div className="mt-6 flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => {
+                    setStatus({
+                      loading: false,
+                      error: 'Google Login Failed. Please try again.',
+                      success: '',
+                    });
+                  }}
+                  theme="filled_blue"
+                  shape="pill"
+                  width="100%"
+                  text="continue_with"
+                />
               </div>
             </div>
 

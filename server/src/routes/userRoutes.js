@@ -16,6 +16,7 @@ const {addTaskSchema,upsertNoteSchema} = require('../utils/validationPrepTracker
 // --- Authentication & User Routes ---
 router.post('/signup',validate(signupSchema),userController.signup)
 router.post('/login',validate(loginSchema),userController.login)
+router.post('/google-login', userController.googleLogin)
 router.get('/profile',protect,getProfileController.getProfile)
 router.post('/studentDetails' ,  protect ,validate(userDetailsSchema), userDetailsController.userDetails)
 router.get('/check-eligibility/:postId',protect, eligibilityController.checkPostEligibility);

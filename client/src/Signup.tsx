@@ -1,6 +1,8 @@
 import React, { useState, type ChangeEvent, type FormEvent } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
+import { API_BASE } from './utils/api';
 
 type SignupResponse = {
   message?: string;
@@ -96,12 +98,52 @@ const Signup: React.FC<SignupProps> = ({
       }
       
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Something went wrong.';
+      setStatus({
+        loading: false,
+        error: error instanceof Error ? error.message : 'Something went wrong.',
+        success: '',
+      });
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setStatus({ loading: true, error: '', success: '' });
+    try {
+      const response = await fetch(`${API_BASE}/api/users/google-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: credentialResponse.credential,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Google authentication failed.');
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
 
       setStatus({
         loading: false,
-        error: message,
+        error: '',
+        success: 'Account created with Google!',
+      });
+
+      if (typeof onSuccess === 'function') {
+        setTimeout(() => {
+          onSuccess();
+        }, 1200);
+      }
+    } catch (error) {
+      setStatus({
+        loading: false,
+        error: error instanceof Error ? error.message : 'Google authentication failed.',
         success: '',
       });
     }
@@ -326,6 +368,34 @@ const Signup: React.FC<SignupProps> = ({
                 'Sign Up'
               )}
             </button>
+
+            <div className="mt-8">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/5"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-3 bg-slate-950 rounded-full text-slate-500 border border-white/10 text-[9px] uppercase tracking-[0.2em] font-bold">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => {
+                    setStatus({
+                      loading: false,
+                      error: 'Google Sign up Failed. Please try again.',
+                      success: '',
+                    });
+                  }}
+                  theme="filled_blue"
+                  shape="pill"
+                  width="100%"
+                  text="signup_with"
+                />
+              </div>
+            </div>
 
             <div className="mt-8 text-center sm:mt-10">
               <span className="text-sm text-slate-400">Already have an account?</span>

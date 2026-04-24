@@ -12,10 +12,12 @@ type FormProps = {
   onSuccess?: () => void;
 };
 
-const Form: React.FC<FormProps> = ({ onSuccess }) => {
+const Form: React.FC<FormProps> = ({ signInEndpoint, onOpenSignup, onForgotPassword, onSuccess }) => {
   const [formData, setFormData] = useState({ email: '', password: '', remember: false });
   const [status, setStatus] = useState({ loading: false, error: '', success: '' });
   const navigate = useNavigate();
+  
+  const endpoint = signInEndpoint || `${API_BASE}/api/users/login`;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -27,7 +29,7 @@ const Form: React.FC<FormProps> = ({ onSuccess }) => {
     setStatus({ loading: true, error: '', success: '' });
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/login`, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -171,7 +173,11 @@ const Form: React.FC<FormProps> = ({ onSuccess }) => {
                   />
                   <span className="text-xs font-bold text-slate-400 group-hover:text-slate-300 transition-colors">Remember Me</span>
                 </label>
-                <button type="button" className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors">
+                <button 
+                  type="button" 
+                  onClick={onForgotPassword || (() => navigate('/forgot-password'))}
+                  className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
+                >
                   Reset Password?
                 </button>
               </div>
@@ -250,9 +256,13 @@ const Form: React.FC<FormProps> = ({ onSuccess }) => {
 
               <p className="text-center text-sm font-medium text-slate-400">
                 New to Eligify?{' '}
-                <Link to="/signup" className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-4 decoration-cyan-400/30">
+                <button 
+                  type="button"
+                  onClick={onOpenSignup || (() => navigate('/signup'))}
+                  className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-4 decoration-cyan-400/30"
+                >
                   Create Account
-                </Link>
+                </button>
               </p>
             </div>
           </div>

@@ -5,10 +5,18 @@ import { GoogleLogin } from '@react-oauth/google';
 import { Sparkles, Mail, Lock, User, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { API_BASE } from './utils/api';
 
-const Signup: React.FC = () => {
+interface SignupProps {
+  signupEndpoint?: string;
+  onOpenLogin?: () => void;
+  onSuccess?: () => void;
+}
+
+const Signup: React.FC<SignupProps> = ({ signupEndpoint, onOpenLogin, onSuccess }) => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [status, setStatus] = useState({ loading: false, error: '', success: '' });
   const navigate = useNavigate();
+  
+  const endpoint = signupEndpoint || `${API_BASE}/api/users/signup`;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,7 +27,7 @@ const Signup: React.FC = () => {
     setStatus({ loading: true, error: '', success: '' });
 
     try {
-      const res = await fetch(`${API_BASE}/api/users/signup`, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -31,7 +39,10 @@ const Signup: React.FC = () => {
       localStorage.setItem('token', data.token);
       setStatus({ loading: false, error: '', success: 'Account created successfully!' });
       
-      setTimeout(() => navigate('/student-details'), 1500);
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+        else navigate('/student-details');
+      }, 1500);
     } catch (err: any) {
       setStatus({ loading: false, error: err.message, success: '' });
     }
@@ -52,7 +63,10 @@ const Signup: React.FC = () => {
       localStorage.setItem('token', data.token);
       setStatus({ loading: false, error: '', success: 'Welcome to Eligify!' });
       
-      setTimeout(() => navigate('/dashboard'), 1500);
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+        else navigate('/dashboard');
+      }, 1500);
     } catch (err: any) {
       setStatus({ loading: false, error: err.message, success: '' });
     }
@@ -241,9 +255,13 @@ const Signup: React.FC = () => {
 
               <p className="text-center text-sm font-medium text-slate-400">
                 Already part of Eligify?{' '}
-                <Link to="/login" className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-4 decoration-cyan-400/30">
+                <button 
+                  type="button"
+                  onClick={onOpenLogin || (() => navigate('/login'))}
+                  className="font-bold text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-4 decoration-cyan-400/30"
+                >
                   Log in here
-                </Link>
+                </button>
               </p>
             </div>
           </div>

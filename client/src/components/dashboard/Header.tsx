@@ -145,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenSidebar }) => {
                   <button 
                     onClick={() => {
                       localStorage.removeItem('token');
-                      navigate('/');
+                      window.location.href = '/';
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-200 hover:pl-4 group cursor-pointer"
                   >

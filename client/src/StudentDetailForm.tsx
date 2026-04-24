@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserCircle, GraduationCap, Award, Briefcase, Activity, FileText } from 'lucide-react';
 import { API_BASE } from './utils/api';
@@ -15,6 +16,7 @@ const {
   COURSES_DATA: coursesData,
 } = ((types as any).default || types) as typeof types;
 import { getEligibilityReadiness } from './utils/profileReadiness';
+import Loader from './components/ui/Loader';
 
 type Qualification = (typeof QUALIFICATION_LEVELS)[number];
 type Gender = (typeof GENDERS)[number];
@@ -193,6 +195,7 @@ const Field = ({
 );
 
 const StudentDetailFormDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -442,7 +445,7 @@ const StudentDetailFormDashboard: React.FC = () => {
 
       setSubmitMessage('Details saved successfully! Redirecting to dashboard...');
       setTimeout(() => {
-        window.location.href = '/my-profile';
+        navigate('/my-profile');
       }, 1000);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong.';
@@ -488,41 +491,34 @@ const StudentDetailFormDashboard: React.FC = () => {
   }, [formData, visibleAcademicFields]);
 
   if (profileLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 rounded-full border-4 border-cyan-400/30 border-t-cyan-400 animate-spin" />
-          <p className="text-slate-400 text-sm">Loading your profile...</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Syncing Profile" />;
   }
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.12),_transparent_28%),linear-gradient(180deg,_#020617_0%,_#0f172a_45%,_#020617_100%)] px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-6 rounded-3xl border border-white/10 bg-slate-950/60 px-6 py-5 shadow-[0_20px_80px_rgba(2,6,23,0.55)] backdrop-blur">
-          <p className="text-xs font-semibold uppercase tracking-[0.38em] text-cyan-300">
+        <div className="mb-6 rounded-3xl border border-white/10 bg-slate-950/60 px-5 py-4 sm:px-6 sm:py-5 shadow-[0_20px_80px_rgba(2,6,23,0.55)] backdrop-blur">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.38em] text-cyan-300">
             Candidate Dashboard
           </p>
-          <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-white">
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 Student Detail Form
               </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
-                Save partial drafts anytime. Eligibility matching unlocks once the
-                required profile fields for your qualification are complete.
+              <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-400 sm:text-sm sm:leading-7">
+                Eligibility matching unlocks once the
+                required profile fields are complete.
               </p>
             </div>
-            <div className="min-w-[220px] rounded-2xl border border-cyan-400/10 bg-cyan-400/10 px-4 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
+            <div className="flex items-center justify-between rounded-2xl border border-cyan-400/10 bg-cyan-400/10 px-4 py-3 sm:min-w-[220px] sm:flex-col sm:items-start sm:py-4">
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-cyan-200">
                 Profile completion
               </p>
-              <p className="mt-2 text-3xl font-semibold text-white">{completion}%</p>
+              <p className="text-xl font-bold text-white sm:mt-2 sm:text-3xl">{completion}%</p>
             </div>
           </div>
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-800">
             <div
               className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 transition-all duration-300"
               style={{ width: `${completion}%` }}
@@ -531,7 +527,8 @@ const StudentDetailFormDashboard: React.FC = () => {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
-          <aside className={`${cardClasses} p-5`}>
+          {/* Sidebar - Desktop Only */}
+          <aside className={`${cardClasses} p-5 hidden xl:block self-start sticky top-8`}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cyan-300">
@@ -598,21 +595,42 @@ const StudentDetailFormDashboard: React.FC = () => {
                 </p>
                 <p className="mt-2 text-lg font-semibold text-white">More details needed</p>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
-                  {eligibilityReadiness.missingFields.length} required items are still missing for your current qualification.
+                  {eligibilityReadiness.missingFields.length} required items are still missing.
                 </p>
-                <ul className="mt-4 space-y-2 text-sm text-amber-100">
-                  {eligibilityReadiness.missingFields.map((field) => (
-                    <li key={field.key} className="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-2">
-                      {field.label}
-                    </li>
-                  ))}
-                </ul>
               </div>
             ) : null}
           </aside>
 
-          <div className={`${cardClasses} p-6 sm:p-8`}>
-            <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+          {/* Main Content Area */}
+          <div className="space-y-6">
+            {/* Mobile Progress Header */}
+            <div className="flex flex-col gap-3 xl:hidden">
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/60 p-4">
+                 <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-slate-950 shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+                       {React.createElement(stepTitles[currentStep].icon, { className: "h-5 w-5" })}
+                    </div>
+                    <div>
+                       <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">{stepTitles[currentStep].eyebrow}</p>
+                       <p className="text-sm font-bold text-white">{stepTitles[currentStep].title}</p>
+                    </div>
+                 </div>
+                 <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase">Step</p>
+                    <p className="text-sm font-bold text-white">{currentStep + 1} <span className="text-slate-500">/ {stepTitles.length}</span></p>
+                 </div>
+              </div>
+              
+              {/* Mini Step Dots */}
+              <div className="flex gap-1.5 px-1">
+                {stepTitles.map((_, i) => (
+                  <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${i <= currentStep ? 'bg-cyan-400' : 'bg-slate-800'}`} />
+                ))}
+              </div>
+            </div>
+
+            <div className={`${cardClasses} p-5 sm:p-8`}>
+            <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 hidden sm:flex sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cyan-300">
                   {stepTitles[currentStep].eyebrow}
@@ -890,6 +908,7 @@ const StudentDetailFormDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

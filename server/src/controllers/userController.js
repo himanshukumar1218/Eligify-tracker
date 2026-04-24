@@ -51,7 +51,7 @@ exports.signup = async (req, res) => {
 };
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, remember } = req.body;
         const existingUser = await userQueries.getUserByEmail(email);
         if (!existingUser) {
             return res.status(400).json({ message: "No account found with this email. Please sign up first." });
@@ -68,7 +68,7 @@ exports.login = async (req, res) => {
             is_admin: existingUser.is_admin
         },
             process.env.SECRET_KEY,
-            { expiresIn: '100m' }
+            { expiresIn: remember ? '30d' : '24h' }
         )
         const { password_hash, ...userWithoutPassword } = existingUser;
         return res.status(200).json({

@@ -117,12 +117,17 @@ const Signup: React.FC<SignupProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0B1120] text-slate-100 font-sans selection:bg-cyan-500/30">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/30 overflow-hidden">
+      {/* Global Background Glows */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/15 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
+      </div>
       {/* Left Side - Branding & Features */}
       <div className="w-full lg:w-1/2 relative flex flex-col justify-center px-8 py-12 lg:px-12 xl:px-24 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5">
-        {/* Background Effects */}
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+        {/* Local Background Effects */}
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
@@ -215,7 +220,7 @@ const Signup: React.FC<SignupProps> = ({
                   placeholder="johndoe"
                   value={formData.username}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 sm:text-sm transition-all duration-200"
+                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
                 />
               </div>
             </div>
@@ -238,7 +243,7 @@ const Signup: React.FC<SignupProps> = ({
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 sm:text-sm transition-all duration-200"
+                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
                 />
               </div>
             </div>
@@ -262,7 +267,7 @@ const Signup: React.FC<SignupProps> = ({
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 sm:text-sm transition-all duration-200"
+                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
                 />
                 <button
                   type="button"
@@ -271,16 +276,22 @@ const Signup: React.FC<SignupProps> = ({
                 >
                   {showPassword ? (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" />
                     </svg>
                   ) : (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   )}
                 </button>
               </div>
+              <p className="mt-2 text-[11px] text-slate-500 flex items-center gap-1.5 ml-1">
+                <svg className="w-3.5 h-3.5 text-cyan-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Password should only contain letters and digits (no special characters).
+              </p>
             </div>
 
             {status.error && (

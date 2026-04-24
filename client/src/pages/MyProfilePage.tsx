@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { getEligibilityReadiness } from '../utils/profileReadiness';
 import { CheckCircle2, AlertTriangle, Pencil, User, BookOpen, Activity, Briefcase, Award } from 'lucide-react';
 import { API_BASE } from '../utils/api';
+import Loader from '../components/ui/Loader';
 
 const formatDate = (dateString: string) => {
   if (!dateString) return 'N/A';
@@ -78,6 +79,7 @@ const MyProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCompletionPopup, setShowCompletionPopup] = useState(false);
+  const [activeTab, setActiveTab] = useState<'personal' | 'academics' | 'professional'>('personal');
   const verificationItems = ['Identity Verified', 'Category Verified'];
 
   useEffect(() => {
@@ -112,14 +114,7 @@ const MyProfilePage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-700 border-t-cyan-400" />
-          <p className="text-sm font-medium tracking-widest text-slate-500 uppercase animate-pulse">Loading Profile…</p>
-        </div>
-      </div>
-    );
+    return <Loader text="Fetching Profile" />;
   }
 
   if (error) {
@@ -178,87 +173,85 @@ const MyProfilePage: React.FC = () => {
   const strengthColor = profileStrength === 100 ? 'from-emerald-400 to-teal-400' : profileStrength >= 75 ? 'from-cyan-400 to-blue-500' : profileStrength >= 40 ? 'from-blue-400 to-violet-500' : 'from-amber-400 to-orange-500';
 
   return (
-    <div className="relative space-y-6 pb-24">
-      {/* Hero Header */}
+    <div className="relative space-y-4 pb-24">
+      {/* Unified Profile Header */}
       <motion.section
         variants={fadeUp} initial="hidden" animate="show" transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/60 p-6 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.25)] lg:p-8"
+        className="relative overflow-hidden rounded-[2rem] border border-cyan-500/10 bg-slate-900/60 p-4 backdrop-blur-xl shadow-[0_25px_60px_rgba(2,6,23,0.6)] sm:p-6"
       >
-        {/* Ambient Glow */}
-        <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px]" />
-        <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-blue-500/10 blur-[60px]" />
-
-        <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          {/* Avatar + Name */}
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        {/* Compact Layout for New Users */}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-4">
             <div className="relative shrink-0">
-              <div className="absolute inset-0 rounded-[28px] bg-gradient-to-br from-cyan-400 to-blue-600 blur-xl opacity-40" />
-              <div className="relative flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-cyan-400 via-blue-500 to-violet-600 text-3xl font-bold text-white shadow-[0_16px_40px_rgba(37,99,235,0.4)]">
-                {initials || <User className="h-10 w-10" />}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 blur-lg opacity-40" />
+              <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-violet-600 text-xl font-bold text-white">
+                {initials || <User className="h-6 w-6" />}
               </div>
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.32em] text-slate-500">Digital Resume</p>
-              <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-white lg:text-4xl">{profile.basic.fullName || 'Candidate Profile'}</h1>
-              <p className="mt-2 max-w-xl text-sm leading-7 text-slate-400">Review your verified identity, academic records, physical standards, and experience before applying for matched exams.</p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {verificationItems.map(item => <CheckBadge key={item} text={item} />)}
-              </div>
+              <h1 className="text-xl font-bold text-white">{profile.basic.fullName || 'Candidate'}</h1>
+              {!eligibilityReadiness.isReady ? (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Action Required: Profile Incomplete</p>
+                </div>
+              ) : (
+                <div className="mt-1 flex gap-2">
+                   {verificationItems.map(item => <CheckBadge key={item} text={item} />)}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Profile Strength Card */}
-          <div className="w-full max-w-xs shrink-0 rounded-2xl border border-white/10 bg-slate-950/60 p-5">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Profile Strength</p>
-              {!eligibilityReadiness.isReady && (
-                <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-300">Incomplete</span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {/* Minimal Strength Indicator */}
+            <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-slate-950/40 px-3 py-2">
+              <div className="text-right">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Strength</p>
+                <p className={`text-lg font-bold bg-gradient-to-r ${strengthColor} bg-clip-text text-transparent`}>{profileStrength}%</p>
+              </div>
+              <div className="h-8 w-[2px] bg-white/5" />
+              {!eligibilityReadiness.isReady ? (
+                <Link to="/student-details" className="flex items-center gap-2 rounded-lg bg-amber-300 px-4 py-2 text-[10px] font-bold text-slate-950 hover:bg-amber-200">
+                  Finish Now
+                </Link>
+              ) : (
+                <Link to="/student-details" className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-[10px] font-bold text-white hover:bg-white/20">
+                  <Pencil className="h-3 w-3" /> Edit
+                </Link>
               )}
             </div>
-            <p className={`mt-1 text-4xl font-extrabold bg-gradient-to-r ${strengthColor} bg-clip-text text-transparent`}>{profileStrength}%</p>
-            <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-800">
-              <motion.div
-                className={`h-full rounded-full bg-gradient-to-r ${strengthColor} shadow-[0_0_12px_rgba(34,211,238,0.4)]`}
-                initial={{ width: 0 }} animate={{ width: `${profileStrength}%` }} transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
-              />
-            </div>
-            <p className="mt-3 text-xs text-slate-500 leading-5">Complete your profile to unlock full eligibility matching.</p>
           </div>
         </div>
       </motion.section>
 
-      {/* Eligibility Alert */}
-      {!eligibilityReadiness.isReady && (
-        <motion.section variants={fadeUp} initial="hidden" animate="show" transition={{ duration: 0.5, delay: 0.15 }}
-          className="rounded-[2rem] border border-amber-400/25 bg-amber-400/8 p-6 backdrop-blur-md"
-        >
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-amber-400" />
-                <p className="text-xs font-bold uppercase tracking-[0.3em] text-amber-300">Eligibility Readiness</p>
-              </div>
-              <h2 className="text-xl font-bold tracking-tight text-white">Matching is paused — a few fields are missing</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300">Accurate eligibility results appear only once baseline profile fields are complete.</p>
-            </div>
-            <Link to="/student-details" className="shrink-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-300 px-5 py-3 text-sm font-bold text-slate-950 transition-all hover:bg-amber-200 hover:scale-105">
-              <Pencil className="h-4 w-4" /> Complete Profile
-            </Link>
-          </div>
-          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {eligibilityReadiness.missingFields.map((field: any) => (
-              <div key={field.key} className="rounded-2xl border border-amber-400/15 bg-slate-950/40 px-4 py-3 text-sm font-medium text-amber-100">
-                {field.label}
-              </div>
-            ))}
-          </div>
-        </motion.section>
-      )}
+
+      {/* Mobile Tab Navigation */}
+      <div className="flex lg:hidden overflow-x-auto no-scrollbar rounded-2xl border border-white/5 bg-slate-900/40 p-1.5 backdrop-blur-md">
+        {[
+          { id: 'personal', label: 'Personal', icon: User },
+          { id: 'academics', label: 'Academics', icon: BookOpen },
+          { id: 'professional', label: 'Professional', icon: Briefcase },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+              activeTab === tab.id 
+                ? 'bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.15)] ring-1 ring-cyan-500/30' 
+                : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            <tab.icon className="h-3.5 w-3.5" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* Main Grid */}
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.7fr]">
-        {/* Left Column */}
-        <div className="space-y-6">
+        {/* Left Column (Personal & Physical) */}
+        <div className={`space-y-6 ${activeTab === 'personal' ? 'block' : 'hidden lg:block'}`}>
           {/* Personal Profile */}
           <GlassCard delay={0.2} className="p-6">
             <SectionTitle icon={User} eyebrow="Personal" title="Personal Profile" subtitle="Core identity attributes used by eligibility filters." />
@@ -284,94 +277,98 @@ const MyProfilePage: React.FC = () => {
           </GlassCard>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column (Academics & Professional) */}
         <div className="space-y-6">
           {/* Academic Timeline */}
-          <GlassCard delay={0.3} className="p-6">
-            <SectionTitle icon={BookOpen} eyebrow="Academics" title="Academic Timeline" subtitle="Qualification history used to evaluate exam eligibility." />
-            <div className="space-y-5">
-              {academicTimeline.map((item, index) => (
-                <div key={`${item.level}-${index}`} className="relative pl-10">
-                  {index !== academicTimeline.length - 1 && (
-                    <div className="absolute left-[14px] top-10 h-[calc(100%-10px)] w-px bg-gradient-to-b from-cyan-500/30 to-transparent" />
-                  )}
-                  {/* Timeline Node */}
-                  <div className="absolute left-0 top-2 flex h-7 w-7 items-center justify-center">
-                    <div className="absolute h-full w-full rounded-full bg-cyan-500/20 animate-ping opacity-30" style={{ animationDuration: '3s' }} />
-                    <div className="relative h-5 w-5 rounded-full border border-cyan-500/40 bg-cyan-600/20 shadow-[0_0_12px_rgba(34,211,238,0.3)]" />
-                  </div>
-                  {/* Card */}
-                  <motion.div
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                    className="rounded-2xl border border-white/8 bg-slate-800/40 p-5 hover:border-cyan-500/20 hover:bg-slate-800/60 transition-all"
-                  >
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="text-lg font-bold text-white">{item.level}</h3>
-                          {item.verified && <CheckBadge text="Verified" />}
-                        </div>
-                        <p className="mt-2 text-sm font-medium text-slate-300">{item.institution || 'N/A'}</p>
-                        <p className="mt-0.5 text-sm text-slate-500">{item.meta || 'N/A'}</p>
-                      </div>
-                      <div className="grid gap-3 sm:grid-cols-2 shrink-0">
-                        <div className="rounded-xl border border-white/5 bg-slate-900/60 px-4 py-3 min-w-[100px]">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Primary Score</p>
-                          <p className="mt-1.5 text-lg font-bold text-white">{item.scoreA}</p>
-                        </div>
-                        <div className="rounded-xl border border-white/5 bg-slate-900/60 px-4 py-3 min-w-[100px]">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{item.level === '12th Standard' ? 'Passing Year' : 'Secondary'}</p>
-                          <p className="mt-1.5 text-lg font-bold text-white">{item.scoreB}</p>
-                        </div>
-                      </div>
+          <div className={activeTab === 'academics' ? 'block' : 'hidden lg:block'}>
+            <GlassCard delay={0.3} className="p-6">
+              <SectionTitle icon={BookOpen} eyebrow="Academics" title="Academic Timeline" subtitle="Qualification history used to evaluate exam eligibility." />
+              <div className="space-y-5">
+                {academicTimeline.map((item, index) => (
+                  <div key={`${item.level}-${index}`} className="relative pl-10">
+                    {index !== academicTimeline.length - 1 && (
+                      <div className="absolute left-[14px] top-10 h-[calc(100%-10px)] w-px bg-gradient-to-b from-cyan-500/30 to-transparent" />
+                    )}
+                    {/* Timeline Node */}
+                    <div className="absolute left-0 top-2 flex h-7 w-7 items-center justify-center">
+                      <div className="absolute h-full w-full rounded-full bg-cyan-500/20 animate-ping opacity-30" style={{ animationDuration: '3s' }} />
+                      <div className="relative h-5 w-5 rounded-full border border-cyan-500/40 bg-cyan-600/20 shadow-[0_0_12px_rgba(34,211,238,0.3)]" />
                     </div>
-                    {item.subjects?.length ? (
-                      <div className="mt-4 pt-4 border-t border-white/5">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500 mb-3">Standardized Subjects</p>
-                        <div className="flex flex-wrap gap-2">
-                          {item.subjects.map(subject => (
-                            <span key={subject} className="rounded-full border border-blue-500/20 bg-blue-600/10 px-3 py-1.5 text-xs font-semibold text-blue-200">{subject}</span>
-                          ))}
+                    {/* Card */}
+                    <motion.div
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                      className="rounded-2xl border border-white/8 bg-slate-800/40 p-5 hover:border-cyan-500/20 hover:bg-slate-800/60 transition-all"
+                    >
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            <h3 className="text-lg font-bold text-white">{item.level}</h3>
+                            {item.verified && <CheckBadge text="Verified" />}
+                          </div>
+                          <p className="mt-2 text-sm font-medium text-slate-300">{item.institution || 'N/A'}</p>
+                          <p className="mt-0.5 text-sm text-slate-500">{item.meta || 'N/A'}</p>
+                        </div>
+                        <div className="grid gap-3 sm:grid-cols-2 shrink-0">
+                          <div className="rounded-xl border border-white/5 bg-slate-900/60 px-4 py-3 min-w-[100px]">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Primary Score</p>
+                            <p className="mt-1.5 text-lg font-bold text-white">{item.scoreA}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/5 bg-slate-900/60 px-4 py-3 min-w-[100px]">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">{item.level === '12th Standard' ? 'Passing Year' : 'Secondary'}</p>
+                            <p className="mt-1.5 text-lg font-bold text-white">{item.scoreB}</p>
+                          </div>
                         </div>
                       </div>
-                    ) : null}
-                  </motion.div>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
+                      {item.subjects?.length ? (
+                        <div className="mt-4 pt-4 border-t border-white/5">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500 mb-3">Standardized Subjects</p>
+                          <div className="flex flex-wrap gap-2">
+                            {item.subjects.map(subject => (
+                              <span key={subject} className="rounded-full border border-blue-500/20 bg-blue-600/10 px-3 py-1.5 text-xs font-semibold text-blue-200">{subject}</span>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          </div>
 
           {/* Experience & Certifications */}
-          <GlassCard delay={0.35} className="p-6">
-            <SectionTitle icon={Briefcase} eyebrow="Professional" title="Experience & Certifications" subtitle="Supplemental qualification signals for technical and service roles." />
-            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-              <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-5">
-                <div className="flex items-center gap-2 mb-1">
-                  <Briefcase className="h-4 w-4 text-cyan-400" />
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Experience</p>
+          <div className={activeTab === 'professional' ? 'block' : 'hidden lg:block'}>
+            <GlassCard delay={0.35} className="p-6">
+              <SectionTitle icon={Briefcase} eyebrow="Professional" title="Experience & Certifications" subtitle="Supplemental qualification signals for technical and service roles." />
+              <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+                <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Briefcase className="h-4 w-4 text-cyan-400" />
+                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Experience</p>
+                  </div>
+                  <p className="mt-3 text-5xl font-extrabold tracking-tight text-white">{profile.experience.years || '0'}</p>
+                  <p className="mt-1 text-sm font-bold text-slate-500">years</p>
+                  <p className="mt-3 text-sm text-slate-400">Field: <span className="text-slate-200 font-medium">{profile.experience.field || 'Not specified'}</span></p>
                 </div>
-                <p className="mt-3 text-5xl font-extrabold tracking-tight text-white">{profile.experience.years || '0'}</p>
-                <p className="mt-1 text-sm font-bold text-slate-500">years</p>
-                <p className="mt-3 text-sm text-slate-400">Field: <span className="text-slate-200 font-medium">{profile.experience.field || 'Not specified'}</span></p>
+                <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Award className="h-4 w-4 text-cyan-400" />
+                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Certifications</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.certifications?.length ? (
+                      profile.certifications.map(cert => (
+                        <span key={cert} className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200">{cert}</span>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-500">No certifications added yet.</span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="rounded-2xl border border-white/5 bg-slate-950/60 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Award className="h-4 w-4 text-cyan-400" />
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Certifications</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {profile.certifications?.length ? (
-                    profile.certifications.map(cert => (
-                      <span key={cert} className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200">{cert}</span>
-                    ))
-                  ) : (
-                    <span className="text-sm text-slate-500">No certifications added yet.</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </GlassCard>
+            </GlassCard>
+          </div>
         </div>
       </div>
 

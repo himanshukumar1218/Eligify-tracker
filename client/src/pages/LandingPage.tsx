@@ -1,9 +1,19 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { Zap, ShieldCheck, BellRing, Target, ArrowRight, FileCheck, CheckCircle2, LayoutDashboard } from 'lucide-react';
+import Footer from '../components/Footer';
 
 const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [token, navigate]);
+
   // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -22,9 +32,10 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen overflow-hidden bg-[#020617] text-slate-100 font-sans selection:bg-cyan-500/30">
       {/* Dynamic Background Effects */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/10 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-600/10 blur-[120px]" />
-        <div className="absolute top-[40%] left-[50%] translate-x-[-50%] w-[80%] h-[30%] rounded-[100%] bg-indigo-600/5 blur-[150px]" />
+        <div className="absolute top-[-15%] left-[-15%] w-[60%] h-[60%] rounded-full bg-cyan-600/20 blur-[140px]" />
+        <div className="absolute bottom-[-15%] right-[-15%] w-[60%] h-[60%] rounded-full bg-blue-600/15 blur-[140px]" />
+        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-violet-600/10 blur-[120px]" />
+        <div className="absolute top-[50%] left-[50%] translate-x-[-50%] w-[100%] h-[40%] rounded-[100%] bg-cyan-600/5 blur-[160px]" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
@@ -34,20 +45,17 @@ const LandingPage: React.FC = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col gap-4 rounded-3xl border border-white/5 bg-white/[0.02] px-6 py-5 backdrop-blur-xl xl:flex-row xl:items-center xl:justify-between shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
+          className="flex flex-col gap-4 rounded-3xl border border-white/10 bg-slate-900/40 px-6 py-5 backdrop-blur-2xl xl:flex-row xl:items-center xl:justify-between shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
         >
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
               <ShieldCheck className="h-6 w-6 text-slate-950" />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">
-                Government Exam Platform
+              <p className="text-xl font-bold tracking-tight text-white">
+                Eligify
               </p>
-                <p className="text-xl font-bold tracking-tight text-white">
-                  EligibilityHub
-                </p>
-              </div>
+            </div>
             </div>
 
           <div className="flex items-center gap-3">
@@ -83,9 +91,9 @@ const LandingPage: React.FC = () => {
                 </span>
               </motion.div>
               
-              <motion.h1 variants={fadeInUp} className="mt-8 text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-[4.5rem] leading-[1.1]">
-                Check Your Government Exam Eligibility Faster. <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-300">
+              <motion.h1 variants={fadeInUp} className="mt-8 text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-[5rem] leading-[1.05] drop-shadow-[0_10px_30px_rgba(34,211,238,0.2)]">
+                Check Your Government Exam Eligibility <span className="text-cyan-400">Faster</span>. <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400">
                   Track Alerts. Apply Smarter.
                 </span>
               </motion.h1>
@@ -97,7 +105,7 @@ const LandingPage: React.FC = () => {
               <motion.div variants={fadeInUp} className="mt-10 flex flex-wrap gap-4">
                 <Link
                   to="/signup"
-                  className="group relative flex items-center gap-3 overflow-hidden rounded-2xl bg-white px-8 py-4 text-base font-bold text-slate-950 transition-all hover:bg-slate-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+                  className="group relative flex items-center gap-3 overflow-hidden rounded-2xl bg-cyan-400 px-8 py-4 text-base font-bold text-slate-950 transition-all hover:bg-cyan-300 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] active:scale-95"
                 >
                   Create Free Profile
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -302,6 +310,7 @@ const LandingPage: React.FC = () => {
           </section>
 
         </main>
+        <Footer />
       </div>
     </div>
   );

@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import Loader from '../components/ui/Loader';
 import EligibilityDrawer, { type ExamData, type EligibilityReason } from '../components/dashboard/EligibilityDrawer';
 import { API_BASE } from '../utils/api';
+import CustomDropdown from '../components/ui/CustomDropdown';
 
 const statusStyles: Record<string, string> = {
   Eligible: 'border border-emerald-400/20 bg-emerald-400/10 text-emerald-200',
@@ -104,7 +106,18 @@ const EligibleExamsPage: React.FC = () => {
 
   const filteredExams = useMemo(() => {
     if (!currentExams) return [];
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
     return currentExams.filter((exam: any) => {
+      // 30-day Grace Period Logic:
+      // If the exam is closed, hide it if the deadline was more than 30 days ago.
+      if (exam.timingStatus === 'Closed') {
+        const deadlineDate = new Date(exam.deadline);
+        if (deadlineDate < thirtyDaysAgo) return false;
+      }
+
       const examNameStr = String(exam.examName || '').toLowerCase();
       const postNameStr = String(exam.postName || '').toLowerCase();
       const orgStr = String(exam.organisation || '').toLowerCase();
@@ -116,7 +129,7 @@ const EligibleExamsPage: React.FC = () => {
     });
   }, [currentExams, searchQuery, statusFilter]);
 
-  if (loading) return <div className="p-10 text-white animate-pulse uppercase tracking-widest">Scanning Eligibility...</div>;
+  if (loading) return <Loader text="Scanning Eligibility" />;
 
   if (profileIncomplete) {
     return (
@@ -200,19 +213,108 @@ const EligibleExamsPage: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full max-w-sm rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
             />
-            <select 
+            <CustomDropdown
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full sm:w-auto rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
-            >
-              <option value="All">All Statuses</option>
-              <option value="Upcoming">Upcoming (Opening Soon)</option>
-              <option value="Active">Active (Applications Open)</option>
-              <option value="Closed">Closed</option>
-            </select>
+              onChange={setStatusFilter}
+              options={[
+                { value: 'All', label: 'All Statuses' },
+                { value: 'Upcoming', label: 'Upcoming (Opening Soon)' },
+                { value: 'Active', label: 'Active (Applications Open)' },
+                { value: 'Closed', label: 'Closed' }
+              ]}
+              className="w-full sm:w-auto"
+            />
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-white/10">
+        {/* Mobile View: Card List */}
+        <div className="grid gap-4 lg:hidden">
+          {filteredExams.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-500">
+              No exams match your search criteria.
+            </div>
+          ) : (
+            filteredExams.map((exam: any) => (
+              <div 
+                key={exam.postId} 
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40 p-5 shadow-lg transition-all hover:border-cyan-500/30 hover:bg-slate-900/60"
+              >
+                <div className="flex flex-col gap-4">
+                  {/* Title & Org */}
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-bold text-white line-clamp-1">{exam.examName}</h4>
+                      <div className="shrink-0">
+                        {exam.timingStatus === 'Upcoming' ? (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter text-blue-400">
+                            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                            Soon
+                          </span>
+                        ) : exam.timingStatus === 'Closed' ? (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter text-slate-500">
+                            Closed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter text-rose-400">
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-ping"></span>
+                            Live
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-500">{exam.postName}</p>
+                    <p className="mt-2 text-sm text-cyan-400/80">{exam.organisation}</p>
+                  </div>
+
+                  {/* Details Row */}
+                  <div className="flex items-center justify-between border-y border-white/5 py-3">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Deadline</span>
+                      <span className="text-xs text-slate-300 font-medium">{new Date(exam.deadline).toLocaleDateString('en-GB')}</span>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Eligibility</span>
+                      {activeTab === 'eligible' ? (
+                        <span className="text-xs font-bold text-emerald-400 uppercase tracking-tight">Ready</span>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            setSelectedExam(exam);
+                            setIsDrawerOpen(true);
+                          }}
+                          className="text-xs font-bold text-amber-400 underline decoration-amber-400/30 underline-offset-2"
+                        >
+                          Review
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <button
+                    onClick={() => {
+                      const link = exam.url || exam.applyUrl || exam.examUrl;
+                      if (link) window.open(link, '_blank', 'noopener,noreferrer');
+                    }}
+                    disabled={exam.timingStatus === 'Upcoming' || exam.timingStatus === 'Closed'}
+                    className={[
+                      'flex h-11 w-full items-center justify-center rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300',
+                      exam.timingStatus === 'Upcoming'
+                        ? 'border-white/5 bg-white/5 text-slate-500 opacity-50'
+                        : exam.timingStatus === 'Closed'
+                        ? 'border-white/5 bg-slate-900/50 text-slate-600 opacity-50'
+                        : 'border-cyan-400/30 bg-cyan-400/10 text-cyan-200 hover:bg-cyan-400/20 hover:text-white hover:shadow-[0_0_15px_rgba(34,211,238,0.2)]'
+                    ].join(' ')}
+                  >
+                    {exam.timingStatus === 'Upcoming' ? 'Opening Soon' : exam.timingStatus === 'Closed' ? 'Applications Closed' : 'Apply Now'}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View: Table (Hidden on small screens) */}
+        <div className="hidden lg:block overflow-x-auto rounded-2xl border border-white/10">
           <table className="min-w-full divide-y divide-white/10 text-left">
             <thead className="bg-slate-950/80">
               <tr className="text-xs uppercase tracking-[0.2em] text-slate-500">

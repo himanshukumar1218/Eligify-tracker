@@ -17,6 +17,7 @@ type FormProps = {
 type FormDataState = {
   email: string;
   password: string;
+  remember: boolean;
 };
 
 type StatusState = {
@@ -34,6 +35,7 @@ const Form: React.FC<FormProps> = ({
   const [formData, setFormData] = useState<FormDataState>({
     email: '',
     password: '',
+    remember: false,
   });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -70,6 +72,7 @@ const Form: React.FC<FormProps> = ({
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          remember: formData.remember,
         }),
       });
 
@@ -133,12 +136,17 @@ const Form: React.FC<FormProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0B1120] font-sans text-slate-100 selection:bg-cyan-500/30">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#020617] font-sans text-slate-100 selection:bg-cyan-500/30 overflow-hidden">
+      {/* Global Background Glows */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-600/15 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
+      </div>
       {/* Left Side - Branding */}
       <div className="w-full lg:w-1/2 relative flex flex-col justify-center px-8 py-16 lg:px-16 xl:px-24 overflow-hidden border-b lg:border-b-0 lg:border-r border-white/5">
-        {/* Background Effects */}
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+        {/* Local Background Effects */}
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
@@ -199,7 +207,7 @@ const Form: React.FC<FormProps> = ({
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 sm:text-sm transition-all duration-200"
+                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
                 />
               </div>
             </div>
@@ -222,7 +230,7 @@ const Form: React.FC<FormProps> = ({
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 sm:text-sm transition-all duration-200"
+                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-xl leading-5 bg-slate-950/50 text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/20 focus:border-cyan-400 sm:text-sm transition-all duration-300"
                 />
                 <button
                   type="button"
@@ -307,7 +315,7 @@ const Form: React.FC<FormProps> = ({
                   <div className="w-full border-t border-white/5"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-[#121B2A] rounded-full text-slate-500 border border-white/5 text-[10px] uppercase tracking-widest font-semibold">Or continue with</span>
+                  <span className="px-3 bg-slate-950 rounded-full text-slate-500 border border-white/10 text-[9px] uppercase tracking-[0.2em] font-bold">Or continue with</span>
                 </div>
               </div>
 

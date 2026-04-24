@@ -20,6 +20,8 @@ import DashboardLayout from './layouts/DashboardLayout';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import RouteSeo from './components/RouteSeo';
+import Loader from './components/ui/Loader';
+import { useState, useEffect } from 'react';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -70,6 +72,16 @@ const AdminFormPage: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [isBooting, setIsBooting] = useState(true);
+
+  useEffect(() => {
+    // Artificial delay to ensure a smooth splash screen transition
+    const timer = setTimeout(() => setIsBooting(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isBooting) return <Loader fullScreen={true} text="Eligify" />;
+
   return (
     <>
       <RouteSeo />

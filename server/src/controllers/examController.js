@@ -18,16 +18,31 @@ exports.getEligibleExams = async (req, res) => {
 
     // 1. Run the Categorized Bulk Scan
     // Returns { eligible: [...], nearMatches: [...] }
-    const { eligible, nearMatches } = await checkAllExams(userId);
+    const { eligible: rawEligible, nearMatches: rawNearMatches } = await checkAllExams(userId);
 
-    // 2. Return both categories to the frontend
+    // 2. Filter out closed exams that are older than 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const filterByGracePeriod = (exams) => (exams || []).filter(exam => {
+      if (exam.timingStatus === 'Closed') {
+        const deadlineDate = new Date(exam.deadline);
+        return deadlineDate >= thirtyDaysAgo;
+      }
+      return true;
+    });
+
+    const eligible = filterByGracePeriod(rawEligible);
+    const nearMatches = filterByGracePeriod(rawNearMatches);
+
+    // 3. Return both categories to the frontend
     return res.status(200).json({
       success: true,
       data: {
         eligibleCount: eligible.length,
         nearMatchCount: nearMatches.length,
-        eligible,      // Exams with 0 failures
-        nearMatches    // Exams with 1-2 failures for user review
+        eligible,
+        nearMatches
       }
     });
 

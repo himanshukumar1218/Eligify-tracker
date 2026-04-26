@@ -30,26 +30,17 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    platform: [
-      { name: 'Exams Tracked', href: '#' },
-      { name: 'Eligibility Engine', href: '#' },
-      { name: 'Mock Tests', href: '#' },
-      { name: 'Success Stories', href: '#' },
-    ],
     support: [
-      { name: 'Help Center', href: '#' },
-      { name: 'FAQ', href: '#' },
-      { name: 'Contact Us', href: '#' },
-      { name: 'Bug Report', href: '#' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Contact Us', href: '/contact' },
     ],
     legal: [
-      { name: 'Privacy Policy', href: '#' },
-      { name: 'Terms of Service', href: '#' },
+      { name: 'Privacy Policy', href: '/privacy' },
+      { name: 'Terms of Service', href: '/terms' },
       { name: 'Cookie Policy', href: '#' },
     ],
     developer: [
       { name: 'View Source', href: 'https://github.com/himanshukumar1218/Eligify-tracker', icon: Github },
-      { name: 'API Docs', href: '#', icon: ExternalLink },
     ]
   };
 
@@ -98,40 +89,34 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Links Sections */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:col-span-8 gap-8">
-            <div>
-              <h3 className="text-white font-semibold mb-6">Platform</h3>
-              <ul className="space-y-4">
-                {footerLinks.platform.map((link) => (
-                  <li key={link.name}>
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200"
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:col-span-8 gap-8">
             <div>
               <h3 className="text-white font-semibold mb-6">Support</h3>
               <ul className="space-y-4">
-                {footerLinks.support.map((link) => (
-                  <li key={link.name}>
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200"
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
+                {footerLinks.support.map((link) => {
+                  const isInternal = link.href.startsWith('/');
+                  return (
+                    <li key={link.name}>
+                      {isInternal ? (
+                        <Link
+                          to={link.href}
+                          className="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200"
+                        >
+                          {link.name}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-slate-400 text-sm hover:text-cyan-400 transition-colors duration-200"
+                        >
+                          {link.name}
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
@@ -174,17 +159,31 @@ const Footer: React.FC = () => {
         <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-8 gap-y-2 text-slate-500 text-xs">
             <span>© {currentYear} Eligify. All rights reserved.</span>
-            {footerLinks.legal.map(link => (
-              <a
-                key={link.name}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-slate-300 transition-colors"
-              >
-                {link.name}
-              </a>
-            ))}
+            {footerLinks.legal.map(link => {
+              const isInternal = link.href.startsWith('/');
+              if (isInternal) {
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="hover:text-slate-300 transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                );
+              }
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-slate-300 transition-colors"
+                >
+                  {link.name}
+                </a>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-2 text-slate-500 text-xs">

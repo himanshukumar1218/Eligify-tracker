@@ -15,6 +15,10 @@ import ReviewDiscoveredExamsPage from './pages/ReviewDiscoveredExamsPage';
 import PrepTrackerPage from './pages/PrepTrackerPage';
 import DocumentWalletPage from './pages/DocumentWalletPage';
 import NotificationsPage from './pages/NotificationsPage';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
+import FaqPage from './pages/FaqPage';
+import ContactPage from './pages/ContactPage';
 
 import DashboardLayout from './layouts/DashboardLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -111,8 +115,7 @@ const App: React.FC = () => {
         </Route>
 
         {/* Admin Pages (Protected and separated from Student Dashboard Layout) */}
-        <Route
-          path="/admin"
+        <Route path="/admin"
           element={
             <ProtectedRoute requireAdmin={true}>
               <AdminLayout />
@@ -122,6 +125,11 @@ const App: React.FC = () => {
           <Route index element={<AdminFormPage />} />
           <Route path="review-discoveries" element={<ReviewDiscoveredExamsPage />} />
         </Route>
+
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/contact" element={<ContactPage />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

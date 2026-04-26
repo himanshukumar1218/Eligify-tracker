@@ -47,13 +47,43 @@ const getSeoConfig = (pathname: string): SeoConfig => {
     };
   }
 
-  if (pathname === '/signup') {
+  if (pathname === '/privacy') {
     return {
-      title: 'Create Your Eligify Account | Eligify',
+      title: 'Privacy Policy | Data Protection & Privacy at Eligify',
       description:
-        'Create an Eligify account to track government exam eligibility, deadlines, and your application-ready profile.',
-      canonicalPath: '/signup',
-      robots: 'noindex,follow',
+        'Learn how Eligify protects your personal and academic data. Our privacy policy outlines our commitment to data security and transparency.',
+      canonicalPath: '/privacy',
+      robots: 'index,follow',
+    };
+  }
+
+  if (pathname === '/terms') {
+    return {
+      title: 'Terms of Service | Platform Guidelines & User Agreement | Eligify',
+      description:
+        'Read the terms of service for Eligify. Understand your rights, responsibilities, and our platform guidelines for government exam tracking.',
+      canonicalPath: '/terms',
+      robots: 'index,follow',
+    };
+  }
+
+  if (pathname === '/faq') {
+    return {
+      title: 'Frequently Asked Questions | Eligify Support',
+      description:
+        'Get answers to common questions about Eligify, government exam eligibility, deadline alerts, and document management.',
+      canonicalPath: '/faq',
+      robots: 'index,follow',
+    };
+  }
+
+  if (pathname === '/contact') {
+    return {
+      title: 'Contact Us | Eligify Support & Inquiries',
+      description:
+        'Have questions or need assistance? Reach out to the Eligify team. We are here to help you navigate your government exam journey.',
+      canonicalPath: '/contact',
+      robots: 'index,follow',
     };
   }
 

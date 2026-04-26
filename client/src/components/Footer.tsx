@@ -133,14 +133,12 @@ const Footer: React.FC = () => {
                   <div className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/5">
                     <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-2">Recruitment</p>
                     <p className="text-xs text-slate-300 mb-3">Interested in my work?</p>
-                    <a
-                      href="#"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      to="/contact?ref=hire"
                       className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
                     >
                       Hire the Developer <ExternalLink className="h-3 w-3" />
-                    </a>
+                    </Link>
                   </div>
                 </li>
               </ul>

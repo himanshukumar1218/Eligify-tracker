@@ -130,4 +130,46 @@ const sendWelcomeEmail = async (userEmail, userName) => {
     }
 };
 
-module.exports = { sendMatchEmail, sendWelcomeEmail };
+/**
+ * Sends a notification to admin when a user submits a contact form
+ * @param {Object} details - { name, email, message }
+ */
+const sendSupportEmail = async (details) => {
+    const { name, email, message } = details;
+    
+    if (!process.env.SMTP_USER || process.env.SMTP_USER === 'your_email@gmail.com') {
+        console.log(`[EmailService] Skipping support email (SMTP not configured)`);
+        return false;
+    }
+
+    try {
+        const mailOptions = {
+            from: `"Eligify Support" <${process.env.SMTP_USER}>`,
+            to: process.env.SMTP_USER, // Send to yourself/admin
+            subject: `📬 New Support Inquiry from ${name}`,
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
+                    <h2 style="color: #0f172a; border-bottom: 2px solid #06b6d4; padding-bottom: 10px;">New Support Inquiry</h2>
+                    <p style="margin-top: 20px;"><strong>Name:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <div style="background-color: white; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 20px;">
+                        <p style="margin-top: 0; font-weight: bold; color: #64748b; font-size: 12px; text-transform: uppercase;">Message:</p>
+                        <p style="color: #334155; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 11px; margin-top: 30px; text-align: center;">
+                        This inquiry was sent from the Eligify Contact Form.
+                    </p>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`[EmailService] Support email forwarded to admin`);
+        return true;
+    } catch (error) {
+        console.error(`[EmailService] Failed to send support email:`, error);
+        return false;
+    }
+};
+
+module.exports = { sendMatchEmail, sendWelcomeEmail, sendSupportEmail };

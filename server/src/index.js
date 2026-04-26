@@ -7,6 +7,7 @@ const adminRoute = require('./routes/adminRoutes.js')
 const examRoutes = require('./routes/examRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const documentRoutes = require('./routes/documentRoutes');
+const supportRoutes = require('./routes/supportRoutes');
 
 // Initialize background workers
 require('./workers/notificationWorker');
@@ -42,6 +43,7 @@ app.use('/api/admin',adminRoute)
 app.use('/api/exams', examRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/documents', documentRoutes);
+app.use('/api/support', supportRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

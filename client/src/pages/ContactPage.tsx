@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, ArrowLeft, Send, User, MessageSquare, CheckCircle2, Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { API_BASE } from '../utils/api';
 import Footer from '../components/Footer';
 
 const ContactPage: React.FC = () => {
@@ -21,11 +22,28 @@ const ContactPage: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSuccess(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/support/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSuccess(true);
+      } else {
+        alert(data.message || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Contact form error:', error);
+      alert('Failed to send message. Please check your connection.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const fadeInUp = {

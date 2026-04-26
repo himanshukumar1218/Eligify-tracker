@@ -33,7 +33,6 @@ const Footer: React.FC = () => {
     legal: [
       { name: 'Privacy Policy', href: '/privacy' },
       { name: 'Terms of Service', href: '/terms' },
-      { name: 'Cookie Policy', href: '#' },
     ],
     developer: [
       { name: 'View Source', href: 'https://github.com/himanshukumar1218/Eligify-tracker', icon: Github },

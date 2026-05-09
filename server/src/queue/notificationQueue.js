@@ -33,4 +33,18 @@ const notificationQueue = new Queue('NotificationQueue', {
     }
 });
 
+// Setup recurring jobs
+const setupRecurringJobs = async () => {
+    try {
+        await notificationQueue.add('DailyDeadlineScan', {}, { 
+            repeat: { pattern: '0 8 * * *' } 
+        });
+        console.log('[Queue] DailyDeadlineScan scheduled');
+    } catch (err) {
+        console.error('[Queue] Failed to schedule recurring jobs:', err);
+    }
+};
+
+setupRecurringJobs();
+
 module.exports = { notificationQueue, connection };

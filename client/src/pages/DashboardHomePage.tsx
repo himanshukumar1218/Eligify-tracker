@@ -97,6 +97,24 @@ const DashboardHomePage: React.FC = () => {
     fetchDashboardData();
   }, []);
 
+  const handleClearAll = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const res = await fetch(`${API_BASE}/api/notifications/clear`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        setNotifications([]);
+      }
+    } catch (err) {
+      console.error('Failed to clear notifications:', err);
+    }
+  };
+
   // Animations
   const staggerContainer = {
     hidden: { opacity: 0 },
@@ -325,7 +343,7 @@ const DashboardHomePage: React.FC = () => {
                 <p className="text-xs text-slate-400">System and profile updates.</p>
               </div>
             </div>
-            <button className="text-xs font-semibold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 cursor-pointer">
+            <button onClick={handleClearAll} className="text-xs font-semibold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 cursor-pointer">
               Clear All
             </button>
           </div>

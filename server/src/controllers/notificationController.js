@@ -28,4 +28,15 @@ const markNotificationAsRead = async (req, res) => {
     }
 };
 
-module.exports = { getUserNotifications, markNotificationAsRead };
+const clearNotifications = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        await require('../queries/notificationQueries').clearAllNotifications(userId);
+        res.status(200).json({ success: true, message: "All notifications cleared" });
+    } catch (err) {
+        console.error("Error clearing notifications:", err);
+        res.status(500).json({ success: false, message: "Could not clear notifications" });
+    }
+};
+
+module.exports = { getUserNotifications, markNotificationAsRead, clearNotifications };

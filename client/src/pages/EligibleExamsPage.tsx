@@ -110,7 +110,7 @@ const EligibleExamsPage: React.FC = () => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    return currentExams.filter((exam: any) => {
+    const filtered = currentExams.filter((exam: any) => {
       // 30-day Grace Period Logic:
       // If the exam is closed, hide it if the deadline was more than 30 days ago.
       if (exam.timingStatus === 'Closed') {
@@ -127,7 +127,17 @@ const EligibleExamsPage: React.FC = () => {
       const matchStatus = statusFilter === 'All' || exam.timingStatus === statusFilter;
       return matchSearch && matchStatus;
     });
-  }, [currentExams, searchQuery, statusFilter]);
+
+    if (activeTab === 'nearMatches') {
+      filtered.sort((a: any, b: any) => {
+        if (a.timingStatus === 'Closed' && b.timingStatus !== 'Closed') return 1;
+        if (a.timingStatus !== 'Closed' && b.timingStatus === 'Closed') return -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [currentExams, searchQuery, statusFilter, activeTab]);
 
   if (loading) return <Loader text="Scanning Eligibility" />;
 

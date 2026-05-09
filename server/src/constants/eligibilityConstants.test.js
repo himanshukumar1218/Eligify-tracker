@@ -13,7 +13,7 @@ const {
   meetsQualificationLevel,
 } = require('../eligibilityEngine/utils/qualificationUtils');
 
-test('shared constants expose canonical qualification ranking', () => {
+test('shared constants expose  qualification ranking', () => {
   assert.equal(getQualificationRank(QUALIFICATION_LEVELS[0]), 0);
   assert.equal(getQualificationRank(QUALIFICATION_LEVELS[4]), 4);
   assert.equal(meetsQualificationLevel(QUALIFICATION_LEVELS[4], QUALIFICATION_LEVELS[3]), true);

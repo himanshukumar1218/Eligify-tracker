@@ -303,6 +303,22 @@ const getAllPostsData = async (userId) => {
   return rows;
 };
 
+/**
+ * Fetches exams whose application_end date is exactly \`days\` away from today.
+ * @param {number} days - Number of days until deadline
+ */
+const getExamsClosingInDays = async (days) => {
+  assertPositiveInt(days, 'days');
+  const query = `
+    SELECT id AS exam_id, exam_name, application_end
+    FROM exams
+    WHERE status = 'active'
+      AND application_end::date = CURRENT_DATE + $1::integer
+  `;
+  const { rows } = await db.query(query, [days]);
+  return rows;
+};
+
 // ─── Exports ───────────────────────────────────────────────────────────────────
 
-module.exports = { getUserData, getPostData , getAllPostsData };
+module.exports = { getUserData, getPostData , getAllPostsData, getExamsClosingInDays };

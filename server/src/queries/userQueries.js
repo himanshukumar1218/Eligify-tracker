@@ -21,6 +21,6 @@ exports.userProfile = async (id) =>{
 }
 
 exports.getAllUsers = async () => {
-    const result = await pool.query("SELECT id FROM users");
+    const result = await pool.query("SELECT id, username, email FROM users");
     return result.rows;
 }

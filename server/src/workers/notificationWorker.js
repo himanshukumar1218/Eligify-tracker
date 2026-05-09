@@ -60,9 +60,72 @@ const processExamScan = async (job) => {
     }
 };
 
-const notificationWorker = new Worker('NotificationQueue', processExamScan, {
+const processDeadlineScan = async (job) => {
+    console.log(`[Worker] Started DailyDeadlineScan`);
+    
+    // We are looking for exams closing in exactly 3 days
+    const daysLeft = 3;
+    const { getExamsClosingInDays } = require("../eligibilityEngine/queries/eligibilityQueries");
+    const { sendDeadlineEmail } = require("../services/emailService");
+    
+    const closingExams = await getExamsClosingInDays(daysLeft);
+    if (!closingExams || closingExams.length === 0) {
+        console.log(`[Worker] No exams closing in ${daysLeft} days.`);
+        return;
+    }
+
+    const users = await getAllUsers();
+    console.log(`[Worker] Scanning ${users.length} users against ${closingExams.length} closing exams.`);
+
+    const notificationsToInsert = [];
+
+    for (const exam of closingExams) {
+        const postResult = await pool.query('SELECT id, post_name FROM exam_posts WHERE exam_id = $1', [exam.exam_id]);
+        const posts = postResult.rows;
+
+        for (const user of users) {
+            for (const post of posts) {
+                try {
+                    const result = await checkEligibility(user.id, post.id);
+                    if (result.eligible) {
+                        notificationsToInsert.push({
+                            userId: user.id,
+                            postId: post.id,
+                            title: `Deadline Alert: ${exam.exam_name}`,
+                            message: `Only ${daysLeft} days left to apply for the ${post.post_name} post. If already applied, please ignore.`,
+                            category: 'alert'
+                        });
+
+                        sendDeadlineEmail(user.email, user.username, exam.exam_name, post.post_name, daysLeft).catch(e => console.error(e));
+                    }
+                } catch (err) {
+                    if (err.code !== 'PROFILE_INCOMPLETE') {
+                        // ignore
+                    }
+                }
+            }
+        }
+    }
+
+    if (notificationsToInsert.length > 0) {
+        console.log(`[Worker] Found ${notificationsToInsert.length} deadline alerts to send.`);
+        await bulkInsertNotifications(notificationsToInsert);
+    } else {
+        console.log(`[Worker] Deadline scan complete. 0 alerts.`);
+    }
+};
+
+const dispatchJob = async (job) => {
+    if (job.name === 'DailyDeadlineScan') {
+        return processDeadlineScan(job);
+    }
+    // Default to processExamScan (e.g. for ScanExamEvent)
+    return processExamScan(job);
+};
+
+const notificationWorker = new Worker('NotificationQueue', dispatchJob, {
     connection,
-    concurrency: 2 // Can process up to 2 exam scans concurrently
+    concurrency: 2 
 });
 
 notificationWorker.on('completed', job => {

@@ -41,3 +41,9 @@ exports.markAsRead = async (notificationId, userId) => {
     const result = await pool.query(query, [notificationId, userId]);
     return result.rows[0];
 };
+
+exports.clearAllNotifications = async (userId) => {
+    const query = `DELETE FROM student_notifications WHERE user_id = $1`;
+    await pool.query(query, [userId]);
+    return true;
+};

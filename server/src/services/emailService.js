@@ -34,24 +34,39 @@ const sendMatchEmail = async (userEmail, userName, examName, postName) => {
             to: userEmail,
             subject: `🎉 New Exam Match: ${examName}`,
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                    <h2 style="color: #0f172a;">Hello ${userName},</h2>
-                    <p style="color: #334155; font-size: 16px; line-height: 1.5;">
-                        Great news! Based on your academic profile, you are eligible to apply for a new exam post.
-                    </p>
-                    <div style="background-color: #f8fafc; border-left: 4px solid #06b6d4; padding: 15px; margin: 20px 0;">
-                        <h3 style="margin-top: 0; color: #0f172a;">${examName}</h3>
-                        <p style="margin-bottom: 0; color: #475569;"><strong>Post:</strong> ${postName}</p>
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #020617; color: #f8fafc; border-radius: 16px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="display: inline-block; padding: 12px; background: linear-gradient(135deg, #22d3ee 0%, #2563eb 100%); border-radius: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 24px; color: white; font-weight: bold;">E</span>
+                        </div>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; letter-spacing: -0.5px;">New Exam Match</h1>
                     </div>
-                    <p style="color: #334155; font-size: 16px; line-height: 1.5;">
-                        Log in to your dashboard to view the full details and start your application process before the deadline.
-                    </p>
-                    <a href="http://localhost:5173/eligible-exams" style="display: inline-block; background-color: #06b6d4; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
-                        View Exam Details
-                    </a>
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-                    <p style="color: #94a3b8; font-size: 12px; text-align: center;">
-                        You received this email because you are opted into eligibility alerts.
+                    
+                    <div style="background-color: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b;">
+                        <h2 style="margin-top: 0; color: #22d3ee; font-size: 20px;">Hello ${userName},</h2>
+                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6;">
+                            Great news! Based on your academic profile, you are eligible to apply for a new exam post.
+                        </p>
+                        
+                        <div style="margin: 25px 0; padding: 20px; background-color: #1e293b; border-left: 4px solid #22d3ee; border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #ffffff; font-size: 18px;">${examName}</h3>
+                            <p style="margin-bottom: 0; color: #cbd5e1; font-size: 15px;"><strong>Post:</strong> ${postName}</p>
+                        </div>
+                        
+                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6;">
+                            Log in to your dashboard to view the full details and start your application process before the deadline.
+                        </p>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="https://geteligify.app/eligible-exams" style="display: inline-block; background: linear-gradient(to right, #22d3ee, #06b6d4); color: #020617; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                View Exam Details
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #475569; font-size: 13px; text-align: center; margin-top: 30px;">
+                        You received this email because you are opted into eligibility alerts. <br>
+                        © 2024 Eligify Platform. All rights reserved.
                     </p>
                 </div>
             `
@@ -148,16 +163,31 @@ const sendSupportEmail = async (details) => {
             to: process.env.SMTP_USER, // Send to yourself/admin
             subject: `📬 New Support Inquiry from ${name}`,
             html: `
-                <div style="font-family: sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
-                    <h2 style="color: #0f172a; border-bottom: 2px solid #06b6d4; padding-bottom: 10px;">New Support Inquiry</h2>
-                    <p style="margin-top: 20px;"><strong>Name:</strong> ${name}</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <div style="background-color: white; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 20px;">
-                        <p style="margin-top: 0; font-weight: bold; color: #64748b; font-size: 12px; text-transform: uppercase;">Message:</p>
-                        <p style="color: #334155; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #020617; color: #f8fafc; border-radius: 16px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="display: inline-block; padding: 12px; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); border-radius: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 24px; color: white; font-weight: bold;">E</span>
+                        </div>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; letter-spacing: -0.5px;">Support Inquiry</h1>
                     </div>
-                    <p style="color: #94a3b8; font-size: 11px; margin-top: 30px; text-align: center;">
-                        This inquiry was sent from the Eligify Contact Form.
+                    
+                    <div style="background-color: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b;">
+                        <h2 style="margin-top: 0; color: #a855f7; font-size: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 15px;">New Message Received</h2>
+                        
+                        <div style="margin-top: 20px;">
+                            <p style="color: #94a3b8; font-size: 15px; margin: 5px 0;"><strong>Name:</strong> <span style="color: #f8fafc;">${name}</span></p>
+                            <p style="color: #94a3b8; font-size: 15px; margin: 5px 0;"><strong>Email:</strong> <span style="color: #f8fafc;">${email}</span></p>
+                        </div>
+                        
+                        <div style="margin: 25px 0 0 0; padding: 20px; background-color: #1e293b; border-left: 4px solid #a855f7; border-radius: 8px;">
+                            <p style="margin-top: 0; font-weight: bold; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Message:</p>
+                            <p style="color: #cbd5e1; line-height: 1.6; white-space: pre-wrap; margin-bottom: 0;">${message}</p>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #475569; font-size: 13px; text-align: center; margin-top: 30px;">
+                        This inquiry was sent from the Eligify Contact Form. <br>
+                        © 2024 Eligify Platform. All rights reserved.
                     </p>
                 </div>
             `
@@ -193,27 +223,42 @@ const sendDeadlineEmail = async (userEmail, userName, examName, postName, daysLe
             to: userEmail,
             subject: `⚠️ Deadline Approaching: ${examName}`,
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                    <h2 style="color: #0f172a;">Hello ${userName},</h2>
-                    <p style="color: #334155; font-size: 16px; line-height: 1.5;">
-                        This is an automated reminder from the Eligibility Engine. You have a matched opportunity that is closing in exactly <strong>${daysLeft} days</strong>.
-                    </p>
-                    <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
-                        <h3 style="margin-top: 0; color: #b45309;">${examName}</h3>
-                        <p style="margin-bottom: 0; color: #78350f;"><strong>Post:</strong> ${postName}</p>
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #020617; color: #f8fafc; border-radius: 16px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div style="display: inline-block; padding: 12px; background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); border-radius: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 24px; color: white; font-weight: bold;">E</span>
+                        </div>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; letter-spacing: -0.5px;">Deadline Alert</h1>
                     </div>
-                    <p style="color: #334155; font-size: 16px; line-height: 1.5;">
-                        If you haven't applied yet, log in to your dashboard to view the full details and submit your application before the deadline passes.
-                    </p>
-                    <p style="color: #475569; font-size: 14px; font-style: italic;">
-                        If you have already applied, please ignore this email.
-                    </p>
-                    <a href="http://localhost:5173/eligible-exams" style="display: inline-block; background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
-                        View Exam Details
-                    </a>
-                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-                    <p style="color: #94a3b8; font-size: 12px; text-align: center;">
-                        You received this email because you are opted into eligibility alerts.
+                    
+                    <div style="background-color: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b;">
+                        <h2 style="margin-top: 0; color: #f59e0b; font-size: 20px;">Hello ${userName},</h2>
+                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6;">
+                            This is an automated reminder from the Eligibility Engine. You have a matched opportunity that is closing in exactly <strong>${daysLeft} days</strong>.
+                        </p>
+                        
+                        <div style="margin: 25px 0; padding: 20px; background-color: #1e293b; border-left: 4px solid #f59e0b; border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #ffffff; font-size: 18px;">${examName}</h3>
+                            <p style="margin-bottom: 0; color: #cbd5e1; font-size: 15px;"><strong>Post:</strong> ${postName}</p>
+                        </div>
+                        
+                        <p style="color: #94a3b8; font-size: 16px; line-height: 1.6;">
+                            If you haven't applied yet, log in to your dashboard to view the full details and submit your application before the deadline passes.
+                        </p>
+                        <p style="color: #64748b; font-size: 14px; font-style: italic; margin-top: 10px;">
+                            If you have already applied, please ignore this email.
+                        </p>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="https://geteligify.app/eligible-exams" style="display: inline-block; background: linear-gradient(to right, #fbbf24, #f59e0b); color: #020617; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                View Exam Details
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #475569; font-size: 13px; text-align: center; margin-top: 30px;">
+                        You received this email because you are opted into eligibility alerts. <br>
+                        © 2024 Eligify Platform. All rights reserved.
                     </p>
                 </div>
             `

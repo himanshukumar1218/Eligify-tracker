@@ -48,9 +48,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, value, onChang
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute z-[100] mt-2 w-full min-w-[200px] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl"
+            className="absolute z-[100] mt-2 w-full min-w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl"
           >
-            <div className="py-1">
+            <div className="py-1 max-h-60 overflow-y-auto custom-scrollbar">
               {options.map((option) => (
                 <button
                   key={option.value}

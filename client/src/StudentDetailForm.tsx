@@ -19,6 +19,7 @@ const {
 import { getEligibilityReadiness } from './utils/profileReadiness';
 import Loader from './components/ui/Loader';
 import CustomDropdown from './components/ui/CustomDropdown';
+import DobPicker from './components/ui/DobPicker';
 
 type Qualification = (typeof QUALIFICATION_LEVELS)[number];
 type Gender = (typeof GENDERS)[number];
@@ -658,8 +659,8 @@ const StudentDetailFormDashboard: React.FC = () => {
                     <Field label="Full Name" htmlFor="fullName">
                       <input id="fullName" name="fullName" title="Full Name" className={inputClasses} value={formData.basic.fullName} onChange={(e) => updateField('basic', 'fullName', e.target.value)} placeholder="e.g. John Doe" />
                     </Field>
-                    <Field label="Date of Birth" htmlFor="dob">
-                      <input id="dob" name="dob" type="date" title="Date of Birth" className={inputClasses} value={formData.basic.dob} onChange={(e) => updateField('basic', 'dob', e.target.value)} />
+                    <Field label="Date of Birth">
+                      <DobPicker value={formData.basic.dob} onChange={(val) => updateField('basic', 'dob', val)} />
                     </Field>
                     <Field label="Gender" htmlFor="gender">
                       <CustomDropdown

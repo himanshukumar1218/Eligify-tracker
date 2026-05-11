@@ -178,6 +178,9 @@ const Signup: React.FC<SignupProps> = ({ signupEndpoint, onOpenLogin, onSuccess 
                     className="w-full rounded-2xl border border-white/5 bg-slate-950/40 py-4.5 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400/50 focus:bg-slate-950/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
                     onChange={handleChange}
                   />
+                  <p className="mt-2 ml-1 text-xs text-slate-400">
+                    Minimum 8 characters. Can include special characters (e.g., @, #, $, %).
+                  </p>
                 </div>
               </div>
 

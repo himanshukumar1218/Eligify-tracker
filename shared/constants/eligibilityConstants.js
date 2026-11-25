@@ -109,8 +109,7 @@ const EXPERIENCE_FIELDS = [
   'Defence',
   'Driver',
 
-  // Other
-  'Other',
+  
 ];
 const BOARD_OPTIONS = [
   "CBSE", "ICSE", "NIOS", "UP Board", "Bihar Board", "Maharashtra Board",

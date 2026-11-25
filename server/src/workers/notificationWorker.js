@@ -4,7 +4,7 @@ const pool = require("../db");
 const { getAllUsers } = require("../queries/userQueries");
 const { checkEligibility } = require("../eligibilityEngine/checkEligibility");
 const { bulkInsertNotifications } = require("../queries/notificationQueries");
-const { sendMatchEmail } = require("../services/emailService");
+const { sendMatchEmail, sendWelcomeEmail, sendNewUserAlertAdmin } = require("../services/emailService");
 
 const processExamScan = async (job) => {
     const { examId, examName } = job.data;
@@ -115,9 +115,27 @@ const processDeadlineScan = async (job) => {
     }
 };
 
+const processWelcomeEmail = async (job) => {
+    console.log(`[Worker] Started WelcomeEmail job for ${job.data.userEmail}`);
+    const { userEmail, userName } = job.data;
+    await sendWelcomeEmail(userEmail, userName);
+};
+
+const processAdminNewUserAlert = async (job) => {
+    console.log(`[Worker] Started AdminNewUserAlert job for ${job.data.userEmail}`);
+    const { userEmail, userName } = job.data;
+    await sendNewUserAlertAdmin(userEmail, userName);
+};
+
 const dispatchJob = async (job) => {
     if (job.name === 'DailyDeadlineScan') {
         return processDeadlineScan(job);
+    }
+    if (job.name === 'WelcomeEmail') {
+        return processWelcomeEmail(job);
+    }
+    if (job.name === 'AdminNewUserAlert') {
+        return processAdminNewUserAlert(job);
     }
     // Default to processExamScan (e.g. for ScanExamEvent)
     return processExamScan(job);

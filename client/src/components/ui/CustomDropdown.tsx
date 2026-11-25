@@ -18,7 +18,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, value, onChang
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  const selectedOption = options.find(opt => opt.value === value) || options[0];
+  const selectedOption = options.find(opt => opt.value === value) ?? options[0] ?? { value: '', label: 'Select' };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,9 +51,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, value, onChang
             className="absolute z-[100] mt-2 w-full min-w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-2xl"
           >
             <div className="py-1 max-h-60 overflow-y-auto custom-scrollbar">
-              {options.map((option) => (
+              {options.map((option, idx) => (
                 <button
-                  key={option.value}
+                  key={option.value !== '' ? option.value : `__placeholder_${idx}`}
                   onClick={() => {
                     onChange(option.value);
                     setIsOpen(false);

@@ -7,10 +7,7 @@ dotenv.config();
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || '465'),
-    secure: parseInt(process.env.SMTP_PORT || '465') === 465, 
-    tls: {
-        rejectUnauthorized: false
-    },
+    secure: parseInt(process.env.SMTP_PORT || '465') === 465,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -35,7 +32,7 @@ const sendMatchEmail = async (userEmail, userName, examName, postName) => {
         const mailOptions = {
             from: `"Eligibility Engine" <${process.env.SMTP_USER}>`,
             to: userEmail,
-            subject: `🎉 New Exam Match: ${examName}`,
+            subject: ` New Exam Match: ${examName}`,
             html: `
                 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #020617; color: #f8fafc; border-radius: 16px;">
                     <div style="text-align: center; margin-bottom: 30px;">
@@ -154,7 +151,7 @@ const sendWelcomeEmail = async (userEmail, userName) => {
  */
 const sendSupportEmail = async (details) => {
     const { name, email, message } = details;
-    
+
     if (!process.env.SMTP_USER || process.env.SMTP_USER === 'your_email@gmail.com') {
         console.log(`[EmailService] Skipping support email (SMTP not configured)`);
         return false;
@@ -166,31 +163,16 @@ const sendSupportEmail = async (details) => {
             to: process.env.SMTP_USER, // Send to yourself/admin
             subject: `📬 New Support Inquiry from ${name}`,
             html: `
-                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #020617; color: #f8fafc; border-radius: 16px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <div style="display: inline-block; padding: 12px; background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); border-radius: 12px; margin-bottom: 15px;">
-                            <span style="font-size: 24px; color: white; font-weight: bold;">E</span>
-                        </div>
-                        <h1 style="margin: 0; color: #ffffff; font-size: 28px; letter-spacing: -0.5px;">Support Inquiry</h1>
+                <div style="font-family: sans-serif; max-width: 600px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
+                    <h2 style="color: #0f172a; border-bottom: 2px solid #06b6d4; padding-bottom: 10px;">New Support Inquiry</h2>
+                    <p style="margin-top: 20px;"><strong>Name:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <div style="background-color: white; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 20px;">
+                        <p style="margin-top: 0; font-weight: bold; color: #64748b; font-size: 12px; text-transform: uppercase;">Message:</p>
+                        <p style="color: #334155; line-height: 1.6; white-space: pre-wrap;">${message}</p>
                     </div>
-                    
-                    <div style="background-color: #0f172a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b;">
-                        <h2 style="margin-top: 0; color: #a855f7; font-size: 20px; border-bottom: 1px solid #1e293b; padding-bottom: 15px;">New Message Received</h2>
-                        
-                        <div style="margin-top: 20px;">
-                            <p style="color: #94a3b8; font-size: 15px; margin: 5px 0;"><strong>Name:</strong> <span style="color: #f8fafc;">${name}</span></p>
-                            <p style="color: #94a3b8; font-size: 15px; margin: 5px 0;"><strong>Email:</strong> <span style="color: #f8fafc;">${email}</span></p>
-                        </div>
-                        
-                        <div style="margin: 25px 0 0 0; padding: 20px; background-color: #1e293b; border-left: 4px solid #a855f7; border-radius: 8px;">
-                            <p style="margin-top: 0; font-weight: bold; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Message:</p>
-                            <p style="color: #cbd5e1; line-height: 1.6; white-space: pre-wrap; margin-bottom: 0;">${message}</p>
-                        </div>
-                    </div>
-                    
-                    <p style="color: #475569; font-size: 13px; text-align: center; margin-top: 30px;">
-                        This inquiry was sent from the Eligify Contact Form. <br>
-                        © 2024 Eligify Platform. All rights reserved.
+                    <p style="color: #94a3b8; font-size: 11px; margin-top: 30px; text-align: center;">
+                        This inquiry was sent from the Eligify Contact Form.
                     </p>
                 </div>
             `

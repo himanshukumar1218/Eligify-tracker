@@ -2,7 +2,7 @@ const userQueries = require('../queries/userQueries')
 const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv")
 const bcrypt = require("bcrypt")
-const { sendWelcomeEmail } = require("../services/emailService")
+const { notificationQueue } = require("../queue/notificationQueue");
 dotenv.config()
 exports.signup = async (req, res) => {
     try {
@@ -22,8 +22,9 @@ exports.signup = async (req, res) => {
 
         const user = await userQueries.createUser(username, email, password_hash);
 
-        // Send welcome email (fire and forget)
-        sendWelcomeEmail(user.email, user.username).catch(e => console.error("[Email] Welcome email failed:", e));
+        // Send welcome email and admin alert via queue
+        notificationQueue.add('WelcomeEmail', { userEmail: user.email, userName: user.username });
+        notificationQueue.add('AdminNewUserAlert', { userEmail: user.email, userName: user.username });
 
         const token = jwt.sign(
             {
@@ -128,8 +129,9 @@ exports.googleLogin = async (req, res) => {
             const password_hash = await bcrypt.hash(Math.random().toString(36), 10);
             user = await userQueries.createUser(username, email, password_hash);
             
-            // Send welcome email for new Google user (fire and forget)
-            sendWelcomeEmail(user.email, user.username).catch(e => console.error("[Email] Google welcome email failed:", e));
+            // Send welcome email and admin alert for new Google user via queue
+            notificationQueue.add('WelcomeEmail', { userEmail: user.email, userName: user.username });
+            notificationQueue.add('AdminNewUserAlert', { userEmail: user.email, userName: user.username });
         }
         
         const token = jwt.sign({
